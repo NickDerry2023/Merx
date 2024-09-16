@@ -8,6 +8,8 @@ from cogs.utils.constants import MerxConstants
 
 
 # Sets bots constants
+# We use constants.py to specify things like the mongo db connnection, prefix
+# and default embed color.
 
 constants = MerxConstants()
 

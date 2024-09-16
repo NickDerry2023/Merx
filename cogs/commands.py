@@ -13,8 +13,8 @@ class CommandsCog(commands.Cog):
     def __init__(self, merx):
         self.merx = merx
         self.constants = MerxConstants()
-
         
+
 
     # This is the info Command for merx. Place every other command before this one, this should be the last command in
     # this file for readability purposes.
@@ -32,6 +32,7 @@ class CommandsCog(commands.Cog):
             pass
         
         
+        
         mongo_db = await self.constants.mongo_setup()
         
         # Collect information for the embed such as the bots uptime, hosting information, database information
@@ -44,6 +45,7 @@ class CommandsCog(commands.Cog):
         version = "Unknown"
 
 
+
         embed = AboutEmbed.create_info_embed(
             uptime=self.merx.start_time,
             guilds=guilds,
@@ -52,12 +54,13 @@ class CommandsCog(commands.Cog):
             version=version,
             bot_name=ctx.guild.name,
             bot_icon=ctx.guild.icon,
-            thumbnail_url="https://cdn.discordapp.com/avatars/1285105545078116453/605985a7a70fb5efbdfc3005c246a0cc.png"
+            thumbnail_url="https://cdn.discordapp.com/avatars/1285105545078116453/64d83da375dd98b02ab12687d0882f62.png"
         )
 
         view = AboutWithButtons.create_view()
 
         await ctx.send(embed=embed, view=view)
+
 
 
 async def setup(merx):
