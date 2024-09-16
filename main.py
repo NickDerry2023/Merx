@@ -3,11 +3,15 @@ import os
 import requests
 import asyncio
 from discord.ext import commands
-from cogs.utils.config import mongo_setup, call_mongo_run, prefix_setup, merx_token_setup
+from cogs.utils.constants import MerxConstants
+
+
+# Sets bots constants
+
+constants = MerxConstants()
 
 
 class Merx(commands.AutoShardedBot):
-
 
     # Sets up the cogs for Merx.
     
@@ -28,7 +32,7 @@ intents.members = True
 
 # Set bot prefix
 
-prefix =  prefix_setup()
+prefix =  constants.prefix_setup
 
 
 merx = Merx(command_prefix=prefix,
@@ -42,7 +46,6 @@ merx = Merx(command_prefix=prefix,
 
 @merx.before_invoke
 async def before_invoke(ctx):
-    constants = ctx.bot.get_cog("Constants")
 
     if ctx.author.id in constants.bypassed_users:
         return
@@ -81,4 +84,4 @@ async def before_invoke(ctx):
 
 
 
-merx.run(merx_token_setup())
+merx.run(constants.merx_token_setup())
