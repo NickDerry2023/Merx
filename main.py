@@ -2,6 +2,7 @@ import discord
 import os
 import requests
 import asyncio
+from datetime import datetime
 from discord.ext import commands
 from cogs.utils.constants import MerxConstants
 
@@ -12,6 +13,27 @@ constants = MerxConstants()
 
 
 class Merx(commands.AutoShardedBot):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.token = None
+        self.start_time = datetime.utcnow()
+        
+        
+        
+    async def is_owner(self, user: discord.User):
+        
+        # Use bypassed users from the constants class instead of hardcoding them
+        
+        constants = MerxConstants()
+        await constants.call_mongo_run()
+        
+        # Check if the user ID is in the bypassed users list
+        
+        if user.id in constants.bypassed_users:
+            return True
+        return False
+
+
 
     # Sets up the cogs for Merx.
     
@@ -32,7 +54,7 @@ intents.members = True
 
 # Set bot prefix
 
-prefix =  constants.prefix_setup
+prefix =  constants.prefix_setup()
 
 
 merx = Merx(command_prefix=prefix,

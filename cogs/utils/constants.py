@@ -35,7 +35,7 @@ class MerxConstants:
     async def mongo_setup(self):
         if self.mongo_client is None:
             self.mongo_client = AsyncIOMotorClient(os.getenv('MONGODB_URL'))
-            self.mongo_db = self.mongo_client[os.getenv('MONGODB_DATABASE')]
+            self.mongo_db = self.mongo_client[os.getenv('MONGODB_DB')]
 
 
 
@@ -49,7 +49,7 @@ class MerxConstants:
     # Fetch the customizable prefix for the bot
     
     def prefix_setup(self):
-        return os.getenv('PREFIX', 'm-')  # Return default prefix '-' if not set
+        return os.getenv('PREFIX')  # Return default prefix '-' if not set
 
 
 
