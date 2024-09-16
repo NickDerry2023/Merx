@@ -7,6 +7,8 @@ from cogs.utils.constants import MerxConstants
 from cogs.utils.embeds import AboutEmbed, AboutWithButtons
 
 
+# The main commands Cog.
+
 class CommandsCog(commands.Cog):
     def __init__(self, merx):
         self.merx = merx
