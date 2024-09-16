@@ -212,3 +212,43 @@ class AboutWithButtons:
 
 
         return view
+
+
+
+# This is a debug command emebed that accepts parameters.    
+    
+class DebugEmbed(discord.Embed):
+    def __init__(self, bot, ctx):
+        
+        
+        # Creates a debug embed with various details for debugging purposes.
+        
+        super().__init__(
+            title="Debug Information",
+            description="Here is the current debug information for the Merx:",
+            color=discord.Color.from_str('#dfa4ff')
+        )
+
+
+        # Define a dictionary with debug information fields
+        
+        fields = {
+            "Latency": f"{round(bot.latency * 1000)} ms",
+            "Server Name": ctx.guild.name,
+            "Server ID": ctx.guild.id,
+            "Channel": ctx.channel.name,
+            "Channel ID": ctx.channel.id,
+            "User": ctx.author.mention,
+            "User ID": ctx.author.id
+        }
+
+
+        # Add all fields to the embed
+        
+        for name, value in fields.items():
+            self.add_field(name=name, value=value, inline=True if "ID" in name else True)
+
+
+        # Set footer with requesting user details
+        
+        self.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar.url)

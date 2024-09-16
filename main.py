@@ -27,7 +27,7 @@ class Merx(commands.AutoShardedBot):
         # Use bypassed users from the constants class instead of hardcoding them
         
         constants = MerxConstants()
-        await constants.call_mongo_run()
+        await constants.mongo_setup()
         
         # Check if the user ID is in the bypassed users list
         

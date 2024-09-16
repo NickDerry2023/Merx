@@ -34,6 +34,12 @@ class CommandsCog(commands.Cog):
         
         
         mongo_db = await self.constants.mongo_setup()
+
+        if mongo_db is None:
+            await ctx.send("<:xmark:1285350796841582612> Failed to connect to the database. Please try again later.", ephemeral=True)
+            return
+        
+        
         
         # Collect information for the embed such as the bots uptime, hosting information, database information
         # user information and server information so that users can see the growth of the bot.
@@ -42,7 +48,8 @@ class CommandsCog(commands.Cog):
         uptime_formatted = f"<t:{int((self.merx.start_time.timestamp()))}:R>"
         guilds = len(self.merx.guilds)
         users = sum(guild.member_count for guild in self.merx.guilds)
-        version = "Unknown"
+        version_info = await mongo_db.command('buildInfo')
+        version = version_info.get('version', 'Unknown')
 
 
 

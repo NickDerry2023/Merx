@@ -34,15 +34,30 @@ class MerxConstants:
     
     async def mongo_setup(self):
         if self.mongo_client is None:
-            self.mongo_client = AsyncIOMotorClient(os.getenv('MONGODB_URL'))
-            self.mongo_db = self.mongo_client[os.getenv('MONGODB_DB')]
+            try:
+                mongodb_url = os.getenv('MONGODB_URL')
+                mongodb_db = os.getenv('MONGODB_DB')
+
+                if not mongodb_url or not mongodb_db:
+                    print("MongoDB URL or Database name not found in environment variables.")
+                    return None
 
 
+                self.mongo_client = AsyncIOMotorClient(mongodb_url)
+                self.mongo_db = self.mongo_client[mongodb_db]
 
-    # A method to ensure MongoDB setup has been called
-    
-    async def call_mongo_run(self):
-        await self.mongo_setup()
+
+                # Test the connection by running a simple command
+                
+                await self.mongo_db.command("ping")
+                print("Successfully connected to MongoDB.")
+                
+                
+            except Exception as e:
+                print(f"Failed to connect to MongoDB: {str(e)}")
+                return None
+
+        return self.mongo_db
 
 
 
