@@ -108,7 +108,7 @@ class BanCommandCog(commands.Cog):
             
     @commands.hybrid_command(name="unban", description="Unban command to unban members from your server.", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_guild_permissions(ban_members=True)
-    async def unban(self, ctx: commands.Context, member: discord.Member, *, reason: str = "No reason provided"):
+    async def unban(self, ctx: commands.Context, user: discord.User, *, reason: str = "No reason provided"):
         
         # Defer the response to avoid delay issues.
         
@@ -122,16 +122,19 @@ class BanCommandCog(commands.Cog):
             banned_users = await ctx.guild.bans()
             user_to_unban = None
 
+
             # Iterate through banned users to find the correct one
             
-            for ban_entry in banned_users:
+            async for ban_entry in banned_users:  # Correct way to iterate async generator
                 if ban_entry.user.id == user.id:
                     user_to_unban = ban_entry.user
                     break
+                
 
             if user_to_unban is None:
                 await ctx.send(f"<:xmark:1285350796841582612> User {user} is not banned.", ephemeral=True)
                 return
+            
 
             # Proceed with unbanning the user
             
@@ -140,9 +143,6 @@ class BanCommandCog(commands.Cog):
             # Confirm the unban action
             
             case_number = f"Case #{str(uuid.uuid4().int)[:8]}"  # Generate a short unique case number
-            
-            
-            
             await ctx.send(f"<:whitecheck:1285350764595773451> **{case_number} - Successfully unbanned {user_to_unban.mention}** for: {reason}.", ephemeral=True)
 
 
