@@ -86,7 +86,6 @@ async def before_invoke(ctx):
             raise commands.CheckFailure("Blacklisted")
 
 
-
     # Server blacklist check
     
     if ctx.command.name != "guild_unblacklist":
@@ -100,10 +99,14 @@ async def before_invoke(ctx):
             raise commands.CheckFailure("Blacklisted")
 
 
-
     if ctx.channel.type == discord.ChannelType.private:
         raise commands.NoPrivateMessage("This command cannot be used in private messages.")
 
 
+def run():
 
-merx.run(constants.merx_token_setup())
+    merx.run(constants.merx_token_setup())
+
+
+if __name__ == "__main__":
+    run()
