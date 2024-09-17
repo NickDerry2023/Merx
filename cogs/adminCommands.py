@@ -119,7 +119,7 @@ class AdminCommandsCog(commands.Cog):
             return
         
         synced = await self.merx.tree.sync()
-        await ctx.send(f"<:whitecheck:1285350764595773451> Synced {len(synced)} commands. Slash commands will now work.")
+        await ctx.send(f"<:whitecheck:1285350764595773451> Synced {len(synced)} commands. The new commands will be slash commands as well.")
 
 
 
