@@ -1,0 +1,114 @@
+import discord
+import asyncio
+import uuid
+from discord.ext import commands
+from cogs.utils.errors import send_error_embed
+from cogs.utils.constants import MerxConstants
+
+
+constants = MerxConstants()
+
+
+class WarnCommandCog(commands.Cog):
+    def __init__(self, merx):
+        self.merx = merx
+        self.constants = MerxConstants()
+
+
+
+    @commands.hybrid_command(description="You can run this command to warn a user in your server.", with_app_command=True, extras={"category": "Moderation"})
+    @commands.has_permissions(administrator=True)
+    async def warn(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
+        mongo_db = await self.constants.mongo_setup()
+
+
+        if mongo_db is None:
+            
+            await ctx.send("<:xmark:1285350796841582612> Failed to connect to the database. Please try again later.", ephemeral=True)
+            return
+        
+        
+        
+        warn_collection = mongo_db["warns"]
+
+
+
+        # Check if the user has administrator permissions
+        
+        if not ctx.author.guild_permissions.administrator:
+            await ctx.send(embed=PermissionDeniedEmbed())
+            return
+
+
+
+        # Check if the bot has permissions to manage messages
+        
+        if not ctx.guild.me.guild_permissions.manage_messages:
+            await ctx.send("<:xmark:1285350796841582612> I do not have permission to manage messages.", color=discord.Color.red())
+            return
+
+
+        # Generate a unique case number
+        
+        case_number = f"Case #{str(uuid.uuid4().int)[:4]}"
+
+
+
+        # Sends a DM to the user
+        
+        try:
+            dm_message = f"<:warning:1285350764595773451> **{case_number} - You have been warned in {ctx.guild.name}** for {reason}."
+            await member.send(dm_message)
+        except discord.Forbidden:
+            await ctx.send(f"<:xmark:1285350796841582612> Unable to send a DM to {member.mention}; warning the user in the server.")
+
+
+
+        # Log to MongoDB, This will put the warning into the database.
+        
+        warn_entry = {
+            "case_number": case_number,
+            "guild_id": ctx.guild.id,
+            "guild_name": ctx.guild.name,
+            "warned_user_id": member.id,
+            "warned_user_name": str(member),
+            "warned_by_id": ctx.author.id,
+            "warned_by_name": str(ctx.author),
+            "reason": reason,
+            "timestamp": ctx.message.created_at.isoformat()
+        }
+        warn_collection.insert_one(warn_entry)
+
+
+        await ctx.send(f"<:warning:1285350764595773451> **{case_number} - {member}** has been warned for {reason}.")
+
+
+
+    # This handles the permission denied and error embeds. It also generates
+    # the UUID for the error embed.
+
+    async def handle_error(self, ctx, error):
+        error_id = str(uuid.uuid4())
+        if isinstance(ctx, discord.Interaction):
+            await send_error_embed(ctx, error, error_id)
+        else:
+            await ctx.send(embed=ErrorEmbed(error=error, error_id=error_id))
+
+
+
+    # These are the cog error handlers they determine how the error is sent.
+
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        await self.handle_error(ctx, error.original if isinstance(error, commands.CommandInvokeError) else error)
+
+
+
+    @commands.Cog.listener()
+    async def on_application_command_error(self, interaction: discord.Interaction, error):
+        await self.handle_error(interaction, error)
+
+
+
+async def setup(merx):
+    await merx.add_cog(WarnCommandCog(merx))

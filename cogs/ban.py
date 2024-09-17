@@ -67,7 +67,7 @@ class BanCommandCog(commands.Cog):
 
         # Generate a unique case number
         
-        case_number = f"Case #{str(uuid.uuid4().int)[:8]}"  # Generate a short unique case number
+        case_number = f"Case #{str(uuid.uuid4().int)[:4]}"  # Generate a short unique case number
         
         # Sends a DM to the user
         
@@ -149,7 +149,7 @@ class BanCommandCog(commands.Cog):
 
             # Confirm the unban action
             
-            case_number = f"Case #{str(uuid.uuid4().int)[:8]}"  # Generate a short unique case number
+            case_number = f"Case #{str(uuid.uuid4().int)[:4]}"  # Generate a short unique case number
             await ctx.send(f"<:whitecheck:1285350764595773451> **{case_number} - Successfully unbanned {user_to_unban.mention}** for: {reason}.", ephemeral=True)
 
 

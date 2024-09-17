@@ -21,7 +21,7 @@ class NickCommandCog(commands.Cog):
 
     @commands.hybrid_command(description="Allows you to nickname a user in a server to whatever you want.", with_app_command=True, extras={"category": "General"})
     @commands.has_permissions(administrator=True)
-    async def nick(self, ctx, member: discord.Member, *, new_nickname: str = None):
+    async def nick(self, ctx, member: discord.Member, *, nickname: str = None):
 
 
         previous_nickname = member.display_name
