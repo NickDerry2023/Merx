@@ -29,12 +29,12 @@ class NickCommandCog(commands.Cog):
 
         try:
             
-            await member.edit(nick=new_nickname if new_nickname else None)
+            await member.edit(nick=nickname if nickname else None)
 
             embed = NicknameSuccessEmbed(
                 user=member,
                 previous_name=previous_nickname,
-                new_name=new_nickname if new_nickname else "Cleared"
+                new_name=nickname if nickname else "Cleared"
             )
             
             await ctx.send(embed=embed)
