@@ -252,3 +252,15 @@ class DebugEmbed(discord.Embed):
         # Set footer with requesting user details
         
         self.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar.url)
+        
+        
+# This is the embed for the bots help center. This embed is the inital embed that shows that
+# tells the user how to use the help center.
+
+class HelpCenterEmbed(discord.Embed):
+    def __init__(self, description: str, color: discord.Color = discord.Color.from_str('#dfa4ff')):
+        super().__init__(
+            title="Merx Help Center",
+            description=description,
+            color=color
+        )
