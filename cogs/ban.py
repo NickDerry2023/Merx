@@ -1,9 +1,11 @@
 import discord
+import asyncio
+import uuid
 from discord.ext import commands
 from cogs.utils.errors import send_error_embed
 from cogs.utils.embeds import DebugEmbed, PermissionDeniedEmbed
 from cogs.utils.constants import MerxConstants
-import uuid
+
 
 # This is the admins cog for the bots admin commands that only server admins may run.
 # This includes a ban command to ban members from your server.
@@ -100,10 +102,15 @@ class BanCommandCog(commands.Cog):
             
             await ctx.send(f"<:whitecheck:1285350764595773451> **{case_number} - {member}** has been banned for {reason}.")
         
+        
         except discord.Forbidden:
-            await ctx.send("<:xmark:1285350796841582612> I do not have permission to ban this member.")
+            await ctx.send(embed=PermissionDeniedEmbed())
+            return
+        
+        
         except discord.HTTPException:
-            await ctx.send("<:xmark:1285350796841582612> An error occurred while trying to ban the member.")
+            error_id = str(uuid.uuid4())
+            await send_error_embed(interaction, e, error_id)
             
             
     @commands.hybrid_command(name="unban", description="Unban command to unban members from your server.", with_app_command=True, extras={"category": "Moderation"})
@@ -151,7 +158,38 @@ class BanCommandCog(commands.Cog):
             await ctx.send("<:xmark:1285350796841582612> I do not have permissions to unban this user.", ephemeral=True)
 
         except discord.HTTPException as e:
-            await ctx.send(f"<:xmark:1285350796841582612> Failed to unban the user. Error: {str(e)}", ephemeral=True)
+            error_id = str(uuid.uuid4())
+            await send_error_embed(interaction, e, error_id)
+    
+    
+    
+    # This handles the permission denied and error embeds. It also generates
+    # the UUID for the error embed.
+
+    async def handle_permission_denied(self, ctx):
+        embed = PermissionDeniedEmbed()
+        await ctx.send(embed=embed)
+
+
+    async def handle_error(self, ctx, error):
+        error_id = str(uuid.uuid4())
+        if isinstance(ctx, discord.Interaction):
+            await send_error_embed(ctx, error, error_id)
+        else:
+            await ctx.send(embed=ErrorEmbed(error=error, error_id=error_id))
+
+
+
+    # These are the cog error handlers they determine how the error is sent.
+
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        await self.handle_error(ctx, error.original if isinstance(error, commands.CommandInvokeError) else error)
+
+
+    @commands.Cog.listener()
+    async def on_application_command_error(self, interaction: discord.Interaction, error):
+        await self.handle_error(interaction, error)
     
     
     

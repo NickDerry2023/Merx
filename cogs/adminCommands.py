@@ -1,4 +1,6 @@
 import discord
+import asyncio
+import uuid
 from discord.ext import commands
 from cogs.utils.errors import send_error_embed
 from cogs.utils.embeds import DebugEmbed, PermissionDeniedEmbed, ErrorEmbed
@@ -101,8 +103,8 @@ class AdminCommandsCog(commands.Cog):
             await ctx.send(f"<:whitecheck:1285350764595773451> {user.mention} has been removed from the bypass list.")
             
         except Exception as e:
-            embed = ErrorEmbed()
-            await ctx.send(embed=embed)
+            error_id = str(uuid.uuid4())
+            await send_error_embed(interaction, e, error_id)
     
 
 
@@ -135,6 +137,36 @@ class AdminCommandsCog(commands.Cog):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(embed=PermissionDeniedEmbed())
         
+        
+        
+    # This handles the permission denied and error embeds. It also generates
+    # the UUID for the error embed.
+
+    async def handle_permission_denied(self, ctx):
+        embed = PermissionDeniedEmbed()
+        await ctx.send(embed=embed)
+
+
+    async def handle_error(self, ctx, error):
+        error_id = str(uuid.uuid4())
+        if isinstance(ctx, discord.Interaction):
+            await send_error_embed(ctx, error, error_id)
+        else:
+            await ctx.send(embed=ErrorEmbed(error=error, error_id=error_id))
+
+
+
+    # These are the cog error handlers they determine how the error is sent.
+
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        await self.handle_error(ctx, error.original if isinstance(error, commands.CommandInvokeError) else error)
+
+
+    @commands.Cog.listener()
+    async def on_application_command_error(self, interaction: discord.Interaction, error):
+        await self.handle_error(interaction, error)
+
 
 async def setup(merx):
     await merx.add_cog(AdminCommandsCog(merx))

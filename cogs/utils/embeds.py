@@ -286,9 +286,9 @@ class NicknameSuccessEmbed(discord.Embed):
         super().__init__(
             title="Nickname Changed Successfully",
             description=(
-                f"**User**: {user.mention}\n"
-                f"**Previous Name**: ``{previous_name}``\n"
-                f"**New Name**: ``{new_name}``"
+                f"> **User**: {user.mention}\n"
+                f"> **Previous Name**: ``{previous_name}``\n"
+                f"> **New Name**: ``{new_name}``"
             ),
             color=discord.Color.green()
         )
