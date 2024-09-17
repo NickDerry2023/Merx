@@ -5,3 +5,4 @@ sentry_sdk
 python-dotenv
 jishaku
 DiscordUtils
+requests
