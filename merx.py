@@ -2,6 +2,7 @@ import discord
 import os
 import requests
 import asyncio
+import sentry_sdk
 from datetime import datetime
 from discord.ext import commands
 from cogs.utils.constants import MerxConstants
@@ -104,6 +105,15 @@ async def before_invoke(ctx):
 
 
 def run():
+    
+    # Sets up sentry for advanced error reporting. 
+    # We use Cali Web Design's sentry account.
+    
+    sentry_sdk.init(
+        dsn=constants.sentry_dsn_setup(),
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
 
     merx.run(constants.merx_token_setup())
 
