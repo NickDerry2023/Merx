@@ -18,6 +18,7 @@ class SuccessEmbed(discord.Embed):
         )
 
 
+
 # This is the error embed, call the errors.py file as well as this file and class to pass an error
 
 class ErrorEmbed(discord.Embed):
@@ -31,6 +32,7 @@ class ErrorEmbed(discord.Embed):
             name="",
             value="If you need assistance, please contact support [here](https://discord.gg/nAX4yhVEgy)."
         )
+        
         
         
 # This is the permission denied embed, this will be used for things like admin commands or places where certain roles
@@ -49,6 +51,7 @@ class PermissionDeniedEmbed(discord.Embed):
         )
         
 
+
 # This is the blacklist function for the blacklist system.
 
 class BlacklistEmbed(discord.Embed):
@@ -61,6 +64,7 @@ class BlacklistEmbed(discord.Embed):
         self.add_field(name="Reason", value="Please contact support [here](https://discord.gg/nAX4yhVEgy for more details.")
         
         
+        
 # This is an informative embed
 
 class InfoEmbed(discord.Embed):
@@ -71,6 +75,7 @@ class InfoEmbed(discord.Embed):
             color=color, 
             **kwargs
         )
+
 
 
 # This is for the start of the setup command also known as the disclaimer
@@ -90,6 +95,7 @@ class DisclaimerView(discord.ui.View):
             style=discord.ButtonStyle.red, 
             custom_id="exit")
         )
+
 
 
 # This is the setup options view and it includes buttons
@@ -116,6 +122,7 @@ class SetupOptionsView(discord.ui.View):
         self.add_item(discord.ui.Button(label="Exit Setup", style=discord.ButtonStyle.red, custom_id="exit"))
         
 
+
 # This is the embed for cancelling setup
 
 class ExitSetupEmbed(discord.Embed):
@@ -125,6 +132,7 @@ class ExitSetupEmbed(discord.Embed):
             description="The setup process has been canceled.",
             color=discord.Color.red()
         )
+        
         
 
 # This is for the new about command, edit the info for the command here instead of in the commands file.
@@ -168,6 +176,7 @@ class AboutEmbed:
         embed.set_author(name=bot_name, icon_url=bot_icon)
         embed.set_thumbnail(url=thumbnail_url)
         return embed
+    
     
 
 # This passes the about pages buttons with the embed so that these do not need to be recalled.
@@ -254,6 +263,7 @@ class DebugEmbed(discord.Embed):
         self.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar.url)
         
         
+        
 # This is the embed for the bots help center. This embed is the inital embed that shows that
 # tells the user how to use the help center.
 
@@ -263,4 +273,22 @@ class HelpCenterEmbed(discord.Embed):
             title="Merx Help Center",
             description=description,
             color=color
+        )
+        
+        
+        
+# This is the Nickname success embed. This will tell who was nicknamed, who nicknamed them,
+# and what their previous and new name is. We do this in this file to allow it to be
+# dynamic and edited once.
+
+class NicknameSuccessEmbed(discord.Embed):
+    def __init__(self, user, previous_name, new_name):
+        super().__init__(
+            title="Nickname Changed Successfully",
+            description=(
+                f"**User**: {user.mention}\n"
+                f"**Previous Name**: ``{previous_name}``\n"
+                f"**New Name**: ``{new_name}``"
+            ),
+            color=discord.Color.green()
         )

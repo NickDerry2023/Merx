@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from cogs.utils.errors import send_error_embed
-from cogs.utils.embeds import DebugEmbed, PermissionDeniedEmbed
+from cogs.utils.embeds import DebugEmbed, PermissionDeniedEmbed, ErrorEmbed
 from cogs.utils.constants import MerxConstants
 
 
@@ -66,7 +66,8 @@ class AdminCommandsCog(commands.Cog):
             
             
         except Exception as e:
-            await ctx.send(f"<:xmark:1285350796841582612> Hmmm... something did not complete correctly: {str(e)}")
+            embed = ErrorEmbed()
+            await ctx.send(embed=embed)
 
 
 
@@ -100,7 +101,8 @@ class AdminCommandsCog(commands.Cog):
             await ctx.send(f"<:whitecheck:1285350764595773451> {user.mention} has been removed from the bypass list.")
             
         except Exception as e:
-            await ctx.send(f"<:xmark:1285350796841582612> Hmmm... something did not complete correctly: {str(e)}")
+            embed = ErrorEmbed()
+            await ctx.send(embed=embed)
     
 
 
