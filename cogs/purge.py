@@ -15,6 +15,7 @@ class ClearChatCog(commands.Cog):
         self.cooldown = 2 
     
     
+    # Purge command to purge user messages from discord channels.
     
     @commands.hybrid_command(name="purge", description="Clear a large number of messages from the current channel.", with_app_command=True, extras={"category": "General"})
     @commands.has_permissions(administrator=True)
@@ -22,11 +23,12 @@ class ClearChatCog(commands.Cog):
     async def purge(self, ctx, amount: int):
         
         
+        # This checks to see if the user specified the amount of messages to delete.
+        # this prevents an empty number from being sent.
         
         if amount < 1:
             await ctx.send("Please specify a number of messages to delete.")
             return
-
 
 
         try:
