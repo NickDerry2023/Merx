@@ -7,7 +7,6 @@ from discord.ext import commands
 from cogs.utils.constants import MerxConstants
 
 
-# Sets bots constants
 # We use constants.py to specify things like the mongo db connnection, prefix
 # and default embed color.
 
@@ -21,23 +20,18 @@ class Merx(commands.AutoShardedBot):
         self.start_time = datetime.utcnow()
         
         
+    # Use bypassed users from the constants class instead of hardcoding them
+    # The constants.py file will get the IDs from MongoDb allowing bot owners
+    # to remove and add users.
         
     async def is_owner(self, user: discord.User):
-        
-        # Use bypassed users from the constants class instead of hardcoding them
-        
-        constants = MerxConstants()
-        await constants.mongo_setup()
-        
-        # Check if the user ID is in the bypassed users list
-        
-        if user.id in constants.bypassed_users:
-            return True
-        return False
+        if not constants.bypassed_users:
+            await constants.fetch_bypassed_users()
+        return user.id in constants.bypassed_users
 
 
-
-    # Sets up the cogs for Merx.
+    # Sets up the cogs for Merx. This will cycle thru the cogs folder and
+    # load each file with the .py file extenstion.
     
     async def setup_hook(self) -> None:
         for filename in os.listdir('./cogs'):
@@ -47,7 +41,8 @@ class Merx(commands.AutoShardedBot):
         print('All cogs loaded successfully!')
 
 
-# Sets the bot's intents.
+# Sets the bot's intents. This uses the members intent, default intents, and message_content
+# intent. We will call intents later inorder to start Merx Bot.
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -58,6 +53,8 @@ intents.members = True
 
 prefix =  constants.prefix_setup()
 
+
+# Intializes Merx Bot and loads the prefix, intents, and other important things for discord.
 
 merx = Merx(command_prefix=prefix,
             intents=intents,
@@ -76,6 +73,7 @@ async def before_invoke(ctx):
 
 
     # User blacklist check
+    # This is the unblacklist block to check if users are blacklisted and unblacklisted.
     
     if ctx.command.name != "unblacklist":
         if ctx.author.id in constants.blacklists:
