@@ -104,17 +104,34 @@ class AdminCommandsCog(commands.Cog):
     
 
 
+    # This is a custom sync command cause JSK sync is broken, this will sync the commands with Discord
+    # guilds accross the platform that uses the bot.
+
+
+    @commands.hybrid_command(name="sync", description="Sync commands to the guild or globally.")
+    @commands.has_permissions(administrator=True)
+    async def sync(self, ctx: commands.Context):
+        
+        if not ctx.author.guild_permissions.administrator:
+            await ctx.send(embed=PermissionDeniedEmbed())
+            return
+        
+        synced = await self.merx.tree.sync()
+        await ctx.send(f"<:whitecheck:1285350764595773451> Synced {len(synced)} commands. Slash commands will now work.")
+
+
+
     @add_owner.error
     async def add_owner_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.MissingPermissions):
-            await ctx.send("<:xmark:1285350796841582612> You do not have permission to use this command.")
+            await ctx.send(embed=PermissionDeniedEmbed())
             
             
             
     @remove_owner.error
     async def remove_owner_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.MissingPermissions):
-            await ctx.send("<:xmark:1285350796841582612> You do not have permission to use this command.")
+            await ctx.send(embed=PermissionDeniedEmbed())
         
 
 async def setup(merx):

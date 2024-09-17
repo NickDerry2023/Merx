@@ -4,3 +4,4 @@ zuid
 sentry_sdk
 python-dotenv
 jishaku
+DiscordUtils
