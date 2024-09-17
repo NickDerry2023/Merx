@@ -1,4 +1,4 @@
-# Merx - Discord Moderation Bot
+## Merx - Discord Moderation Bot
 
 Merx is an exceptional moderation and management tool designed specifically for Discord community servers. With just a simple command or message prompt, Merx efficiently handles all aspects of server management, making it an invaluable asset for keeping your server organized and running smoothly.
 
