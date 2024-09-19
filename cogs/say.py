@@ -21,17 +21,13 @@ class SayCommandCog(commands.Cog):
     @commands.hybrid_command(description="Use this command to say things to people using the bot.", with_app_command=True, extras={"category": "General"})
     async def say(self, ctx, *, message: str):
         
-        
         try:
-            if ctx.message:
-                await ctx.message.delete()
-                
             await ctx.send(message)
         except Exception as e:
             error_id = shortuuid.ShortUUID().random(length=8)
             await send_error_embed(interaction, e, error_id)
             
-
+            
 
 async def setup(merx):
     await merx.add_cog(SayCommandCog(merx))
