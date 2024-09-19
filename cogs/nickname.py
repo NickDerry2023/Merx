@@ -3,7 +3,7 @@ import asyncio
 import uuid
 import shortuuid
 from discord.ext import commands
-from cogs.utils.embeds import ErrorEmbed, PermissionDeniedEmbed
+from cogs.utils.embeds import ErrorEmbed, PermissionDeniedEmbed, NicknameSuccessEmbed
 from cogs.utils.constants import MerxConstants
 
 
