@@ -113,6 +113,7 @@ class BanCommandCog(commands.Cog):
             await send_error_embed(interaction, e, error_id)
             
             
+            
     @commands.hybrid_command(name="unban", description="Unban command to unban members from your server.", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_guild_permissions(ban_members=True)
     async def unban(self, ctx: commands.Context, user: discord.User, *, reason: str = "No reason provided"):
@@ -121,37 +122,32 @@ class BanCommandCog(commands.Cog):
         
         await ctx.defer()
 
-
         try:
             
-            # Try to unban the user by getting their ID from the ban list.
+            # This command was hell to write.
+            # Use async for to iterate over the banned users (since it's an async generator).
             
-            banned_users = await ctx.guild.bans()
+            banned_users = ctx.guild.bans()  # Don't await here, just call it.
+
             user_to_unban = None
 
 
-            # Iterate through banned users to find the correct one
+            # Iterate asynchronously through the banned users list.
             
-            async for ban_entry in banned_users:  # Correct way to iterate async generator
+            async for ban_entry in banned_users:
                 if ban_entry.user.id == user.id:
                     user_to_unban = ban_entry.user
                     break
-                
+
 
             if user_to_unban is None:
                 await ctx.send(f"<:xmark:1285350796841582612> User {user} is not banned.", ephemeral=True)
                 return
-            
 
-            # Proceed with unbanning the user
-            
+
             await ctx.guild.unban(user_to_unban, reason=reason)
-
-            # Confirm the unban action
-            
             case_number = f"Case #{str(uuid.uuid4().int)[:4]}"  # Generate a short unique case number
             await ctx.send(f"<:whitecheck:1285350764595773451> **{case_number} - Successfully unbanned {user_to_unban.mention}** for: {reason}.", ephemeral=True)
-
 
 
         except discord.Forbidden:
