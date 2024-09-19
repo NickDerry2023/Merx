@@ -40,12 +40,6 @@ class NickCommandCog(commands.Cog):
             await ctx.send(embed=embed)
 
 
-        # Checks permissions and for common command errors.
-
-        except discord.Forbidden:
-            await self.handle_permission_denied(ctx)
-
-
 
 async def setup(merx):
     await merx.add_cog(NickCommandCog(merx))
