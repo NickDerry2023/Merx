@@ -38,6 +38,10 @@ class NickCommandCog(commands.Cog):
             )
             
             await ctx.send(embed=embed)
+            
+        
+        except discord.Forbidden:
+            await ctx.send("<:xmark:1285350796841582612> I do not have permissions to nickname this user.", ephemeral=False)
 
 
 
