@@ -1,9 +1,9 @@
 import discord
 import asyncio
 import uuid
+import shortuuid
 from discord.ext import commands
-from cogs.utils.errors import send_error_embed
-from cogs.utils.embeds import DebugEmbed, PermissionDeniedEmbed, ErrorEmbed
+from cogs.utils.embeds import DebugEmbed
 from cogs.utils.constants import MerxConstants
 
 
@@ -103,7 +103,7 @@ class AdminCommandsCog(commands.Cog):
             await ctx.send(f"<:whitecheck:1285350764595773451> {user.mention} has been removed from the bypass list.")
             
         except Exception as e:
-            error_id = str(uuid.uuid4())
+            error_id = shortuuid.ShortUUID().random(length=8)
             await send_error_embed(interaction, e, error_id)
     
 
@@ -112,7 +112,7 @@ class AdminCommandsCog(commands.Cog):
     # guilds accross the platform that uses the bot.
 
 
-    @commands.hybrid_command(name="sync", description="Sync commands to the guild or globally.")
+    @commands.command()
     @commands.has_permissions(administrator=True)
     async def sync(self, ctx: commands.Context):
         
@@ -138,35 +138,227 @@ class AdminCommandsCog(commands.Cog):
             await ctx.send(embed=PermissionDeniedEmbed())
         
         
+    # Checks if the user is in the blacklist bypass also known as
+    # bot owners collection so that only we can blacklist users.
+    
+
+    async def is_bypassed_user(self, user_id):
+        collection = constants.mongo_db["blacklist_bypass"]
+        return await collection.find_one({"discord_id": user_id})        
+
+
+
+    # This is the set of commands to unblacklist a user from the bot. This follows the same set of logic as
+    # blacklisting the user but in the opposit order.
+
+    @commands.hybrid_command(name="unblacklist", description="Remove a user or guild from the blacklist.", with_app_command=True, extras={"category": "Administration"})
+    async def unblacklist(self, ctx: commands.Context, id: str, entity_type: str, reason: str = "No reason provided."):
         
-    # This handles the permission denied and error embeds. It also generates
-    # the UUID for the error embed.
+        
+        # Checks to see if the user is bypassed and bot owner. Then it checks to see if you pass
+        # the righr parmeter.
+        
+        bypassed = await self.is_bypassed_user(ctx.author.id)
+        
+        
+        if not bypassed:
+            await self.send_message(ctx, embed=PermissionDeniedEmbed())
+            return
 
-    async def handle_permission_denied(self, ctx):
-        embed = PermissionDeniedEmbed()
-        await ctx.send(embed=embed)
+
+        if entity_type not in ["user", "guild"]:
+            await self.send_message(ctx, "Invalid entity type. Please specify either `user` or `guild`.")
+            return
 
 
-    async def handle_error(self, ctx, error):
-        error_id = str(uuid.uuid4())
+        collection = constants.mongo_db["blacklists"]
+        case_number = f"Case #{str(uuid.uuid4().int)[:4]}"
+
+
+        # This checks to see if its a user that was passed and proceedes to do the blacklist
+        # logic for a user and not a guild.
+
+        if entity_type == "user":
+            
+            
+            try:
+                user = await self.merx.fetch_user(int(id))
+                result = await collection.delete_one({"discord_id": user.id, "type": "user"})
+                if result.deleted_count == 0:
+                    await self.send_message(ctx, f"<:xmark:1285350796841582612> {user.mention} is not blacklisted.")
+                    return
+
+
+                try:
+                    await user.send(f"You have been unblacklisted. **Reason:** {reason}")
+                    
+                    
+                except discord.Forbidden:
+                    await self.send_message(ctx, f"Could not DM {user.mention}, but they were successfully unblacklisted.")
+
+                await self.send_message(ctx, f"<:whitecheck:1285350764595773451> **{case_number} - {user.mention}** has been unblacklisted.")
+            
+            
+            except discord.NotFound:
+                await self.send_message(ctx, f"<:xmark:1285350796841582612> User with ID `{id}` not found.")
+            
+            
+            except Exception as e:
+                await self.send_message(ctx, f"Error unblacklisting user: {e}")
+                return
+
+
+        # This checks if its a guild that was passed and proceeds to blacklist the guild.
+        # note that this is overpowered and you can blacklist guilds that dont even use
+        # Merx Bot. This could be used as an abuse of power so use it wisely. Don't be stupid.
+
+        elif entity_type == "guild":
+            guild_id = int(id)
+            result = await collection.delete_one({"discord_id": guild_id, "type": "guild"})
+            
+            
+            if result.deleted_count == 0:
+                await self.send_message(ctx, f"<:xmark:1285350796841582612> Guild with ID `{id}` is not blacklisted.")
+                return
+
+
+            await self.send_message(ctx, f"<:whitecheck:1285350764595773451> **{case_number} - Guild ID {id}** has been unblacklisted.")
+
+
+
+    async def send_message(self, ctx, content=None, embed=None):
+        
         if isinstance(ctx, discord.Interaction):
-            await send_error_embed(ctx, error, error_id)
+            
+            if ctx.response.is_done():
+                await ctx.followup.send(content=content, embed=embed)
+                
+            else:
+                await ctx.response.send_message(content=content, embed=embed)
+                
+                
         else:
-            await ctx.send(embed=ErrorEmbed(error=error, error_id=error_id))
+            await ctx.send(content=content, embed=embed)
 
 
 
-    # These are the cog error handlers they determine how the error is sent.
+    # Error handling for unblacklist command
+    
+    @unblacklist.error
+    async def unblacklist_error(self, ctx: commands.Context, error):
+        if isinstance(error, commands.MissingPermissions):
+            await self.send_message(ctx, embed=PermissionDeniedEmbed())
+        else:
+            error_id = shortuuid.ShortUUID().random(length=8)
+            await send_error_embed(ctx, error, error_id)
 
-    @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
-        await self.handle_error(ctx, error.original if isinstance(error, commands.CommandInvokeError) else error)
+        
+        
+    # This set of commands allows server administrators to blacklist the bot and prevent users
+    # from runing commands.
+
+    @commands.hybrid_command(name="blacklist", description="Blacklist a user or guild.", with_app_command=True, extras={"category": "Administration"})
+    async def blacklist(self, ctx: commands.Context, id: str, entity_type: str):
+        
+        
+        # Checks to see if the user is bypassed and bot owner. Then it checks to see if you pass
+        # the righr parmeter.
+        
+        bypassed = await self.is_bypassed_user(ctx.author.id)
+        
+        
+        if not bypassed:
+            await self.send_message(ctx, embed=PermissionDeniedEmbed())
+            return
+
+        
+        if entity_type not in ["user", "guild"]:
+            await self.send_message(ctx, "<:xmark:1285350796841582612> Invalid entity type. Please specify either `user` or `guild`.")
+            return
+
+        
+        collection = constants.mongo_db["blacklists"]
+        case_number = f"Case #{str(uuid.uuid4().int)[:4]}"
+
+        
+        # This checks to see if its a user that was passed and proceedes to do the blacklist
+        # logic for a user and not a guild.
+        
+        if entity_type == "user":
+            
+            
+            try:
+                user = await self.merx.fetch_user(int(id))
+                if await collection.find_one({"discord_id": user.id, "type": "user"}):
+                    await self.send_message(ctx, f"<:xmark:1285350796841582612> {user.mention} is already blacklisted.")
+                    return
+
+                await collection.insert_one({"discord_id": user.id, "type": "user"})
+                await self.send_message(ctx, f"<:whitecheck:1285350764595773451> **{case_number} - {user.mention}** has been blacklisted.")
+            
+            
+            except discord.NotFound:
+                await self.send_message(ctx, f"<:xmark:1285350796841582612> User with ID `{id}` not found.")
+            
+            
+            except Exception as e:
+                await self.send_message(ctx, f"Error blacklisting user: {e}")
+                return
 
 
-    @commands.Cog.listener()
-    async def on_application_command_error(self, interaction: discord.Interaction, error):
-        await self.handle_error(interaction, error)
+        # This checks if its a guild that was passed and proceeds to blacklist the guild.
+        # note that this is overpowered and you can blacklist guilds that dont even use
+        # Merx Bot. This could be used as an abuse of power so use it wisely. Don't be stupid.
 
+        elif entity_type == "guild":
+            
+            guild_id = int(id)
+            
+            
+            if await collection.find_one({"discord_id": guild_id, "type": "guild"}):
+                await self.send_message(ctx, f"<:xmark:1285350796841582612> Guild with ID `{id}` is already blacklisted.")
+                return
+
+
+            await collection.insert_one({"discord_id": guild_id, "type": "guild"})
+            await self.send_message(ctx, f"<:whitecheck:1285350764595773451> **{case_number} - Guild ID {id}** has been blacklisted.")
+
+
+
+
+    # This is the logic to send the message depending how the command is run
+    # either slash commands or prefix, we do it this way so that the command
+    # works regarless of how its run, this makes it easier on the user.
+
+    async def send_message(self, ctx, content=None, embed=None):
+
+
+        if isinstance(ctx, discord.Interaction):
+            
+            if ctx.response.is_done():
+                await ctx.followup.send(content=content, embed=embed)
+            else:
+                await ctx.response.send_message(content=content, embed=embed)
+                
+                
+        else:
+            await ctx.send(content=content, embed=embed)
+
+
+
+    # This is the error handling for the blacklist logic incase something goes wrong, like
+    # incorrect permissions.
+    
+    @blacklist.error
+    async def blacklist_error(self, ctx: commands.Context, error):
+        if isinstance(error, commands.MissingPermissions):
+            await self.send_message(ctx, embed=PermissionDeniedEmbed())
+        else:
+            error_id = shortuuid.ShortUUID().random(length=8)
+            await send_error_embed(ctx, error, error_id)   
+    
+        
+        
 
 async def setup(merx):
     await merx.add_cog(AdminCommandsCog(merx))

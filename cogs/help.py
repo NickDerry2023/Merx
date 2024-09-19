@@ -1,10 +1,11 @@
 import discord
 import asyncio
 import uuid
+import shortuuid
 from discord.ext import commands
 from discord.ui import Select, View
 from cogs.utils.constants import MerxConstants
-from cogs.utils.embeds import HelpCenterEmbed, PermissionDeniedEmbed
+from cogs.utils.embeds import HelpCenterEmbed
 
 
 # Brand new help command that uses a drop down and hidden messages to display content in
@@ -116,36 +117,6 @@ class HelpCommandsCog(commands.Cog):
                 categories.add(category)
         return sorted(categories)
     
-    
-    
-    # This handles the permission denied and error embeds. It also generates
-    # the UUID for the error embed.
-
-    async def handle_permission_denied(self, ctx):
-        embed = PermissionDeniedEmbed()
-        await ctx.send(embed=embed)
-
-
-    async def handle_error(self, ctx, error):
-        error_id = str(uuid.uuid4())
-        if isinstance(ctx, discord.Interaction):
-            await send_error_embed(ctx, error, error_id)
-        else:
-            await ctx.send(embed=ErrorEmbed(error=error, error_id=error_id))
-
-
-
-    # These are the cog error handlers they determine how the error is sent.
-
-    @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
-        await self.handle_error(ctx, error.original if isinstance(error, commands.CommandInvokeError) else error)
-
-
-    @commands.Cog.listener()
-    async def on_application_command_error(self, interaction: discord.Interaction, error):
-        await self.handle_error(interaction, error)
-
     
 
 async def setup(merx):
