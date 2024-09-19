@@ -212,7 +212,7 @@ class AboutWithButtons:
         invite_button = Button(
             label="Invite Merx", 
             style=discord.ButtonStyle.link, 
-            url="https://discord.com/oauth2/authorize?client_id=1285105979947749406&permissions=8&integration_type=0&scope=bot"
+            url="https://discord.com/oauth2/authorize?client_id=1285105545078116453&permissions=8&integration_type=0&scope=bot"
         )
 
 
