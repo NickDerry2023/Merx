@@ -17,7 +17,7 @@ class MerxEvents(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self, ctx: commands.Context = None):
-        await self.merx.change_presence(activity=discord.Activity(name="mb-help | beta.merxbot.xyz", type=discord.ActivityType.watching))
+        await self.merx.change_presence(activity=discord.Activity(name=";help | beta.merxbot.xyz", type=discord.ActivityType.watching))
         print(self.merx.user.name + " is ready.")
             
     
