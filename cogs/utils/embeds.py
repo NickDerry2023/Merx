@@ -397,3 +397,12 @@ class RoleSuccessEmbed(discord.Embed):
 class ChannelSuccessEmbed(discord.Embed):
     def __init__(self, title: str, description: str):
         super().__init__(title=title, description=description, color=discord.Color.green())
+        
+        
+
+class SearchResultEmbed(discord.Embed):
+    def __init__(self, title: str, description: str, case_number: int, collection: str, details: str):
+        super().__init__(title=title, description=description, color=constants.merx_embed_color_setup())
+        self.add_field(name="Case Number", value=case_number, inline=False)
+        self.add_field(name="Collection", value=collection, inline=False)
+        self.add_field(name="Details", value=details, inline=False)
