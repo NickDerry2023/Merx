@@ -22,10 +22,11 @@ class SayCommandCog(commands.Cog):
     async def say(self, ctx, *, message: str):
         
         try:
-            await ctx.send(message)
+            # Send the message with no allowed mentions
+            await ctx.send(message, allowed_mentions=discord.AllowedMentions.none())
         except Exception as e:
             error_id = shortuuid.ShortUUID().random(length=8)
-            await send_error_embed(interaction, e, error_id)
+            await send_error_embed(ctx, e, error_id)
             
             
 
