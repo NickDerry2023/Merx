@@ -26,7 +26,7 @@ class MerxEvents(commands.Cog):
         welcome_channel = discord.utils.get(member.guild.text_channels, name="general")
         if welcome_channel:
             member_count = member.guild.member_count
-            await welcome_channel.send(f"> {member.mention} Welcome to **{member.guild.name}**! Feel free to explore. We now have **{member_count}** members. 🎉")        
+            await welcome_channel.send(f"{member.mention} Welcome to **{member.guild.name}**! Feel free to explore. We now have **{member_count}** members. 🎉")        
         
 
 
