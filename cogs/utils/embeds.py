@@ -216,7 +216,7 @@ class AboutWithButtons:
         invite_button = Button(
             label="Invite Merx", 
             style=discord.ButtonStyle.link, 
-            url="https://discord.com/oauth2/authorize?client_id=1285105545078116453&permissions=8&integration_type=0&scope=bot"
+            url="https://discord.com/oauth2/authorize?client_id=1285105979947749406&permissions=8&integration_type=0&scope=bot"
         )
 
 
@@ -381,3 +381,19 @@ class ServerInformationEmbed:
 
 
         return embed
+    
+    
+
+# This is the role success emebed for when a action is performed with roles.
+    
+class RoleSuccessEmbed(discord.Embed):
+    def __init__(self, title: str, description: str):
+        super().__init__(title=title, description=description, color=discord.Color.green())
+        
+        
+        
+# This is the channel success emebed for when channel and category functions are used.        
+        
+class ChannelSuccessEmbed(discord.Embed):
+    def __init__(self, title: str, description: str):
+        super().__init__(title=title, description=description, color=discord.Color.green())

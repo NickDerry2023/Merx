@@ -42,9 +42,9 @@ class AdminCommandsCog(commands.Cog):
     # This command will add users into blacklist_bypass collection so they can run commands like JSK
     # and blacklist_guild or blacklist_user.
         
-    @commands.hybrid_command(name="add_owner", description="Add a user to the bypassed list.", with_app_command=True, extras={"category": "Debugging"})
+    @commands.hybrid_command(name="addowner", description="Add a user to the bypassed list.", with_app_command=True, extras={"category": "Debugging"})
     @commands.has_permissions(administrator=True)
-    async def add_owner(self, ctx: commands.Context, user: discord.User):
+    async def addowner(self, ctx: commands.Context, user: discord.User):
         
         
         # Check if the user is already in the bypass list
@@ -76,9 +76,9 @@ class AdminCommandsCog(commands.Cog):
     # This command will remove owners from the bypassed users and prevent them from using blacklist commands
     # or JSK commands. This is incase the developer or owner leaves or steps down.
     
-    @commands.hybrid_command(name="remove_owner", description="Remove a user from the bypassed list.", with_app_command=True, extras={"category": "Debugging"})
+    @commands.hybrid_command(name="removeowner", description="Remove a user from the bypassed list.", with_app_command=True, extras={"category": "Debugging"})
     @commands.has_permissions(administrator=True)
-    async def remove_owner(self, ctx: commands.Context, user: discord.User):
+    async def removeowner(self, ctx: commands.Context, user: discord.User):
         
         # Always refresh the bypassed users list before performing the check
         
@@ -125,14 +125,14 @@ class AdminCommandsCog(commands.Cog):
 
 
 
-    @add_owner.error
+    @addowner.error
     async def add_owner_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(embed=PermissionDeniedEmbed())
             
             
             
-    @remove_owner.error
+    @removeowner.error
     async def remove_owner_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(embed=PermissionDeniedEmbed())

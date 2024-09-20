@@ -1,5 +1,7 @@
 import discord
 from discord.ext import commands
+from cogs.utils.embeds import ChannelSuccessEmbed, ErrorEmbed
+from cogs.utils.errors import send_error_embed
 
 class ChannelCommandCog(commands.Cog):
     def __init__(self, merx):
@@ -12,49 +14,49 @@ class ChannelCommandCog(commands.Cog):
     async def add(self, ctx, name: str, type: str = "channel", category: discord.CategoryChannel = None):
         
         
-        # Checks to see if its a catagory being made.
-        
         if type.lower() == "category":
             category = await ctx.guild.create_category(name)
-            await ctx.send(f"<:whitecheck:1285350764595773451> Category '{category.name}' created successfully!")
+            embed = ChannelSuccessEmbed(title="Category Created", description=f"<:whitecheck:1285350764595773451> Category '{category.name}' created successfully!")
+            await ctx.send(embed=embed)
             
-        
-        # Checks to see if its a channel being made.
             
         elif type.lower() == "channel":
+            
+            
             if category:
                 channel = await category.create_text_channel(name)
-                await ctx.send(f"<:whitecheck:1285350764595773451> Channel '{channel.name}' created in category '{category.name}'!")
+                embed = ChannelSuccessEmbed(title="Channel Created", description=f"<:whitecheck:1285350764595773451> Channel '{channel.name}' created in category '{category.name}'!")
+                await ctx.send(embed=embed)
                 
                 
             else:
                 channel = await ctx.guild.create_text_channel(name)
-                await ctx.send(f"<:whitecheck:1285350764595773451> Channel '{channel.name}' created successfully!")
+                embed = ChannelSuccessEmbed(title="Channel Created", description=f"<:whitecheck:1285350764595773451> Channel '{channel.name}' created successfully!")
+                await ctx.send(embed=embed)
                 
                 
         else:
-            await ctx.send("Please specify either 'category' or 'channel' as the type.")
+            await ctx.send("<:xmark:1285350796841582612> Please specify either 'category' or 'channel' as the type.")
 
 
-
-    # This is the delete operation to delete channels or catagory.
 
     @commands.hybrid_command(description="Delete a channel or category.", with_app_command=True, extras={"category": "Administration"})
     async def delete(self, ctx, target: discord.abc.GuildChannel):
-
-
+        
+        
         await target.delete()
-        await ctx.send(f"<:whitecheck:1285350764595773451> {target.name} has been deleted successfully.")
+        embed = ChannelSuccessEmbed(title="Deleted Target", description=f"<:whitecheck:1285350764595773451> {target.name} has been deleted successfully.")
+        await ctx.send(embed=embed)
 
 
-    # This allows the moving of the channel.
 
     @commands.hybrid_command(description="Move a channel to another category.", with_app_command=True, extras={"category": "Administration"})
     async def move(self, ctx, channel: discord.abc.GuildChannel, new_category: discord.CategoryChannel):
-
-
+        
+        
         await channel.edit(category=new_category)
-        await ctx.send(f"<:whitecheck:1285350764595773451> Channel '{channel.name}' moved to category '{new_category.name}'.")
+        embed = ChannelSuccessEmbed(title="Channel Moved", description=f"<:whitecheck:1285350764595773451> Channel '{channel.name}' moved to category '{new_category.name}'.")
+        await ctx.send(embed=embed)
 
 
 
