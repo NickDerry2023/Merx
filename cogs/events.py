@@ -15,12 +15,10 @@ class MerxEvents(commands.Cog):
     def __init__(self, merx):
         self.merx = merx
 
-
     @commands.Cog.listener()
     async def on_ready(self, ctx: commands.Context = None):
-        await self.merx.change_presence(activity=discord.Activity(name=";help | merxbot.xyz", type=discord.ActivityType.watching))
+        await self.merx.change_presence(activity=discord.Activity(name="help | merxbot.xyz", type=discord.ActivityType.watching))
         print(self.merx.user.name + " is ready.")
-            
             
     
     @commands.Cog.listener()
@@ -28,8 +26,8 @@ class MerxEvents(commands.Cog):
         welcome_channel = discord.utils.get(member.guild.text_channels, name="general")
         if welcome_channel:
             member_count = member.guild.member_count
-            await welcome_channel.send(f"> {member.mention} Welcome to **{member.guild.name}**! Feel free to explore. We now have **{member_count}** members. 🎉")            
-
+            await welcome_channel.send(f"> {member.mention} Welcome to **{member.guild.name}**! Feel free to explore. We now have **{member_count}** members. 🎉")        
+        
 
 
     # This handles the permission denied and error embeds. It also generates
@@ -50,7 +48,6 @@ class MerxEvents(commands.Cog):
             await ctx.send(embed=ErrorEmbed(error=error, error_id=error_id))
 
 
-
     # These are the cog error handlers they determine how the error is sent.
 
     @commands.Cog.listener()
@@ -61,7 +58,6 @@ class MerxEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_application_command_error(self, interaction: discord.Interaction, error):
         await self.handle_error(interaction, error)
-
 
 
 async def setup(merx):

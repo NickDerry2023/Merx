@@ -11,10 +11,8 @@ from cogs.utils.embeds import HelpCenterEmbed
 # Brand new help command that uses a drop down and hidden messages to display content in
 # a cleaner way. This was taken as inspiration from Lukas (notlukasrx)
 
-
 constants = MerxConstants()
 
-DEFAULT_EMBED_COLOR = discord.Color.from_str('#dfa4ff')
 EXCLUDED_COMMANDS = ['jishaku', 'debug', 'add_owner', 'remove_owner', 'sync']
 
 
@@ -53,7 +51,7 @@ class HelpCommandsCog(commands.Cog):
                 embed = discord.Embed(
                     title=f"Commands for {selected_category}",
                     description=command_list or "No commands available.",
-                    color=DEFAULT_EMBED_COLOR
+                    color=constants.merx_embed_color_setup()
                 )
                 
                 await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -100,7 +98,7 @@ class HelpCommandsCog(commands.Cog):
 
         embed = HelpCenterEmbed(
             description="Welcome to Merx, select a help topic from the dropdown to view the commands. Once you find the command you want simply run it.",
-            color=DEFAULT_EMBED_COLOR
+            color=constants.merx_embed_color_setup()
         )
         
         

@@ -152,8 +152,50 @@ class BanCommandCog(commands.Cog):
 
         except discord.Forbidden:
             await ctx.send("<:xmark:1285350796841582612> I do not have permissions to unban this user.", ephemeral=True)
+            
+        
+        
+    # Softban command that bans and unbans a user, effectively deleting their messages.
     
-    
-    
+    @commands.hybrid_command(description="Softban a user, deleting their messages from the server.", with_app_command=True, extras={"category": "Moderation"})
+    @commands.has_permissions(ban_members=True)
+    @commands.bot_has_permissions(ban_members=True)
+    async def softban(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
+        
+        
+        try:
+
+            await ctx.guild.ban(member, reason=reason, delete_message_days=1)
+            case_number = f"Case #{str(uuid.uuid4().int)[:4]}"  # Generate a short unique case number
+            await ctx.send(f"<:whitecheck:1285350764595773451> **{case_number} - Successfully softbanned {member.mention}** for: {reason}")
+            await asyncio.sleep(2)
+            await ctx.guild.unban(member)
+
+
+        except discord.Forbidden:
+            await ctx.send("<:xmark:1285350796841582612> I do not have permission to ban this user.")
+        except discord.HTTPException as e:
+            error_id = shortuuid.ShortUUID().random(length=8)
+            await send_error_embed(ctx, e, error_id)
+
+
+
+    @softban.error
+    async def softban_error(self, ctx, error):
+        
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("<:xmark:1285350796841582612> You do not have the required permissions to softban members.")
+            
+            
+        elif isinstance(error, commands.BotMissingPermissions):
+            await ctx.send("<:xmark:1285350796841582612> I do not have the required permissions to softban members.")
+            
+            
+        else:
+            error_id = shortuuid.ShortUUID().random(length=8)
+            await send_error_embed(ctx, error, error_id)
+        
+        
+        
 async def setup(merx):
     await merx.add_cog(BanCommandCog(merx))

@@ -1,4 +1,6 @@
 import os
+import discord
+from discord.ext import commands
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 
@@ -98,5 +100,5 @@ class MerxConstants:
     # Fetch the default embed color for the bot
     
     def merx_embed_color_setup(self):
-        DEFAULT_EMBED_COLOR = os.getenv('MERX_EMBED_COLOR')
-        return DEFAULT_EMBED_COLOR if DEFAULT_EMBED_COLOR else "0x00FF00" 
+        DEFAULT_EMBED_COLOR = discord.Color.from_str('#dfa4ff')
+        return DEFAULT_EMBED_COLOR

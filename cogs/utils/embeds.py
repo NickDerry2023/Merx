@@ -1,9 +1,13 @@
 import discord
 import platform
+from datetime import datetime
 from discord import Interaction
 from discord.ext import commands
 from discord.ui import View, Button, Modal, TextInput
 from cogs.utils.constants import MerxConstants
+
+
+constants = MerxConstants()
 
 
 # Success messages can use this embed by calling the class a passing correct prameters.
@@ -292,3 +296,88 @@ class NicknameSuccessEmbed(discord.Embed):
             ),
             color=discord.Color.green()
         )
+        
+        
+        
+# This is the server information emebed logic, this will accept things like server roles, channel counts,
+# emojies, and much more. This embed will also format it like circle does. Simply call this emebed then pass
+# the correct parameters. 
+
+class ServerInformationEmbed:
+    
+    
+    def __init__(self, guild, constants):
+        self.guild = guild
+        self.constants = constants
+
+
+
+    def create_embed(self):
+        
+        
+        # Define the predefined values
+        
+        owner = self.guild.owner
+        member_count = self.guild.member_count
+        created_at = self.guild.created_at.strftime("%B %d, %Y")
+        role_count = len(self.guild.roles)
+        emoji_count = len(self.guild.emojis)
+        text_channels = len(self.guild.text_channels)
+        voice_channels = len(self.guild.voice_channels)
+        announcement_channels = len([c for c in self.guild.channels if isinstance(c, discord.TextChannel) and c.is_news()])
+        forum_channels = len(self.guild.forums)
+        verification_level = str(self.guild.verification_level).capitalize()
+        explicit_content_filter = str(self.guild.explicit_content_filter).replace('_', ' ').capitalize()
+        two_factor_auth = "Enabled" if self.guild.mfa_level == 1 else "Disabled"
+        boosts = self.guild.premium_subscription_count
+        boost_tier = self.guild.premium_tier
+        icon_url = self.guild.icon.url if self.guild.icon else None
+
+
+        # Create the embed
+        
+        embed = discord.Embed(
+            title=f"Server Info - {self.guild.name}",
+            color=self.constants.merx_embed_color_setup(),
+            timestamp=datetime.utcnow()
+        )
+        
+
+        # Add fields to the embed
+        
+        embed.set_thumbnail(url=icon_url)
+        embed.add_field(name="Server Owner", value=f"{owner}", inline=False)
+        embed.add_field(name="Member Count", value=f"{member_count}", inline=False)
+        embed.add_field(name="Creation Date", value=f"{created_at}", inline=False)
+        embed.add_field(name="Verification Level", value=f"{verification_level}", inline=False)
+        embed.add_field(name="2FA Status", value=f"{two_factor_auth}", inline=False)
+        embed.add_field(name="Explicit Content Filter", value=f"{explicit_content_filter}", inline=False)
+        embed.add_field(
+            name="Channels",
+            value=f"Text: {text_channels}\nVoice: {voice_channels}\nAnnouncements: {announcement_channels}\nForum: {forum_channels}",
+            inline=False
+        )
+
+
+        # Roles
+        
+        roles_list = ', '.join([role.mention for role in self.guild.roles[1:20]])
+        if role_count > 20:
+            roles_list += f"... and {role_count - 20} more roles."
+        embed.add_field(name=f"Roles ({role_count})", value=roles_list, inline=False)
+
+
+        # Emojis
+        
+        emoji_list = ', '.join([str(emoji) for emoji in self.guild.emojis[:20]])
+        if emoji_count > 20:
+            emoji_list += f"... and {emoji_count - 20} more emojis."
+        embed.add_field(name=f"Emojis ({emoji_count})", value=emoji_list, inline=False)
+
+
+        # Boost info
+        
+        embed.add_field(name="Boosts", value=f"{boosts} (Tier {boost_tier})", inline=False)
+
+
+        return embed

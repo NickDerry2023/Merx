@@ -2,11 +2,16 @@ import discord
 import platform
 import uuid
 import shortuuid
+from datetime import datetime
 from discord import Interaction
 from discord.ext import commands
 from discord.ui import View, Button
 from cogs.utils.constants import MerxConstants
-from cogs.utils.embeds import AboutEmbed, AboutWithButtons
+from cogs.utils.embeds import AboutEmbed, AboutWithButtons, ServerInformationEmbed
+from cogs.utils.errors import send_error_embed
+
+
+constants = MerxConstants()
 
 
 # The main commands Cog.
@@ -14,7 +19,6 @@ from cogs.utils.embeds import AboutEmbed, AboutWithButtons
 class CommandsCog(commands.Cog):
     def __init__(self, merx):
         self.merx = merx
-        self.constants = MerxConstants()
         
 
 
@@ -35,7 +39,7 @@ class CommandsCog(commands.Cog):
         
         
         
-        mongo_db = await self.constants.mongo_setup()
+        mongo_db = await constants.mongo_setup()
 
         if mongo_db is None:
             await ctx.send("<:xmark:1285350796841582612> Failed to connect to the database. Please try again later.", ephemeral=True)
@@ -63,13 +67,39 @@ class CommandsCog(commands.Cog):
             version=version,
             bot_name=ctx.guild.name,
             bot_icon=ctx.guild.icon,
-            thumbnail_url="https://cdn.discordapp.com/avatars/1285105979947749406/3a8b148f12e07c1d83c32d4ed26f618e.png"
+            thumbnail_url="https://cdn.discordapp.com/avatars/1285105545078116453/6554b31a3623d5df531191c3845835d3.png"
         )
 
         view = AboutWithButtons.create_view()
 
         await ctx.send(embed=embed, view=view)
+        
+        
+        
+    # This is a server information command that will show information about a server
+    # in an easy to read emebed similar to circle bot.
+    
+    @commands.hybrid_command(description="Displays information about the current server.", with_app_command=True, extras={"category": "General"})
+    async def serverinfo(self, ctx):
 
+        try:
+
+            embed = ServerInformationEmbed(ctx.guild, constants).create_embed()
+
+            if isinstance(ctx, Interaction):
+                
+                await ctx.response.send_message(embed=embed)
+                
+            elif isinstance(ctx, commands.Context):
+                
+                await ctx.send(embed=embed)
+            
+            
+        except Exception as e:
+            error_id = shortuuid.ShortUUID().random(length=8)
+            print(f"Exception occurred: {e}")
+            await send_error_embed(ctx, e, error_id)
+        
 
 
 async def setup(merx):
