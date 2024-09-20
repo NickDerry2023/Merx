@@ -11,6 +11,7 @@ class ChannelCommandCog(commands.Cog):
     # This allows the creation of a catagory.
 
     @commands.hybrid_command(description="Create a new channel or category.", with_app_command=True, extras={"category": "Administration"})
+    @commands.has_permissions(administrator=True)
     async def add(self, ctx, name: str, type: str = "channel", category: discord.CategoryChannel = None):
         
         
@@ -41,6 +42,7 @@ class ChannelCommandCog(commands.Cog):
 
 
     @commands.hybrid_command(description="Delete a channel or category.", with_app_command=True, extras={"category": "Administration"})
+    @commands.has_permissions(administrator=True)
     async def delete(self, ctx, target: discord.abc.GuildChannel):
         
         
@@ -51,6 +53,7 @@ class ChannelCommandCog(commands.Cog):
 
 
     @commands.hybrid_command(description="Move a channel to another category.", with_app_command=True, extras={"category": "Administration"})
+    @commands.has_permissions(administrator=True)
     async def move(self, ctx, channel: discord.abc.GuildChannel, new_category: discord.CategoryChannel):
         
         
