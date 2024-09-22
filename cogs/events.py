@@ -28,7 +28,7 @@ class MerxEvents(commands.Cog):
     async def on_member_join(self, member: discord.Member):
         welcome_channel = None
         for channel_name in CHANNEL_NAME_FOR_WELCOME:
-            welcome_channel = discord.utils.get(member.guild.text_channels, name=CHANNEL_NAME_FOR_WELCOME)
+            welcome_channel = discord.utils.get(member.guild.text_channels, name=channel_name)
             if welcome_channel:
                 break
         
