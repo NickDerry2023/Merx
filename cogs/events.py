@@ -66,6 +66,17 @@ class MerxEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_application_command_error(self, interaction: discord.Interaction, error):
         await self.handle_error(interaction, error)
+        
+        
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, commands.CheckFailure):
+            await ctx.send("You are blacklisted and cannot use this command.")
+        elif isinstance(error, commands.NoPrivateMessage):
+            await ctx.send("This command cannot be used in private messages.")
+        else:
+            # Handle other errors
+            pass
 
 
 async def setup(merx):

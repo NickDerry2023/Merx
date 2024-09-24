@@ -108,3 +108,59 @@ class MerxConstants:
 
     def merx_environment_type(self):
         return os.getenv('ENVIRONMENT')
+    
+    
+    
+    async def fetch_blacklisted_users(self):
+        
+        
+        if self.mongo_db is None:
+            await self.mongo_setup()
+            
+            
+        try:
+            collection = self.mongo_db["blacklist"]
+            cursor = collection.find({}, {"discord_id": 1})
+            
+            
+            blacklists = []
+            
+            
+            async for document in cursor:
+                blacklists.append(document["discord_id"])
+            self.blacklists = blacklists
+            
+            
+        except Exception as e:
+            print(f"Error fetching blacklisted users: {str(e)}")
+
+
+
+    async def fetch_blacklisted_guilds(self):
+        
+        
+        if self.mongo_db is None:
+            await self.mongo_setup()
+            
+            
+        try:
+            collection = self.mongo_db["guild_blacklist"]
+            cursor = collection.find({}, {"guild_id": 1})
+            server_blacklists = []
+            
+            
+            async for document in cursor:
+                server_blacklists.append(document["guild_id"])
+            self.server_blacklists = server_blacklists
+            
+            
+        except Exception as e:
+            print(f"Error fetching blacklisted guilds: {str(e)}")
+
+
+
+    # Call this periodically to refresh blacklist data
+    
+    async def refresh_blacklists(self):
+        await self.fetch_blacklisted_users()
+        await self.fetch_blacklisted_guilds()
