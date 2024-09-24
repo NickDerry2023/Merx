@@ -11,6 +11,9 @@ from cogs.utils.embeds import ErrorEmbed, PermissionDeniedEmbed
 from cogs.utils.errors import send_error_embed
 
 
+CHANNEL_NAME_FOR_WELCOME = ["chat", "general"]
+
+
 class MerxEvents(commands.Cog):
     def __init__(self, merx):
         self.merx = merx
@@ -31,10 +34,16 @@ class MerxEvents(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
-        welcome_channel = discord.utils.get(member.guild.text_channels, name="general")
+        welcome_channel = discord.utils.get(member.guild.text_channels, name=CHANMEL_NAME_FOR_WELCOME)
+        welcome_channel = None
+        for channel_name in CHANNEL_NAME_FOR_WELCOME:
+            welcome_channel = discord.utils.get(member.guild.text_channels, name=channel_name)
+            if welcome_channel:
+                break
+        
         if welcome_channel:
             member_count = member.guild.member_count
-            await welcome_channel.send(f"{member.mention} Welcome to **{member.guild.name}**! Feel free to explore. We now have **{member_count}** members. 🎉")        
+            await welcome_channel.send(f"{member.mention} Welcome to **{member.guild.name}**! Feel free to explore. We now have **{member_count}** members. 🎉")         
 
 
     # This handles the permission denied and error embeds. It also generates
