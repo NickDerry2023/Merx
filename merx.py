@@ -74,60 +74,6 @@ merx = Merx(command_prefix=prefix,
 
 
 
-# Function to check the blacklistec guilds or user from MongoDB.
-
-async def global_blacklist_check(ctx):
-    
-
-    # Fetch blacklist if not already fetched or periodically
-    
-    if not constants.blacklists:
-        await constants.fetch_blacklisted_users()
-
-    if not constants.server_blacklists:
-        await constants.fetch_blacklisted_guilds()
-
-
-    # Check if the user is blacklisted
-    
-    if ctx.author.id in constants.blacklists and ctx.command.name != "unblacklist":
-        
-        em = discord.Embed(
-            title="Blacklisted",
-            description="You are blacklisted from Merx - please appeal within our [support server](https://discord.gg/nAX4yhVEgy)!",
-            color=discord.Color(int('fecb02', 16)),
-        )
-        
-        await ctx.send(embed=em)
-        
-        raise commands.CheckFailure("You are blacklisted from using this bot.")
-
-
-    # Check if the guild is blacklisted
-    
-    if ctx.guild and ctx.guild.id in constants.server_blacklists and ctx.command.name != "guild_unblacklist":
-        
-        em = discord.Embed(
-            title="Blacklisted Guild",
-            description="This server is blacklisted from Merx - please appeal within our [support server](https://discord.gg/nAX4yhVEgy)!",
-            color=discord.Color(int('fecb02', 16)),
-        )
-        
-        await ctx.send(embed=em)
-        
-        raise commands.CheckFailure("This guild is blacklisted from using the bot.")
-
-
-    # Prevent the command from being run in DMs
-    
-    if ctx.guild is None:
-        raise commands.NoPrivateMessage("This command cannot be used in private messages.")
-
-    return True
-
-
-
-
 # Before invoking any command, check blacklist.
 
 async def before_invoke(ctx):
@@ -137,12 +83,7 @@ async def before_invoke(ctx):
     # Run the blacklist check
     await global_blacklist_check(ctx)
     
-
-@merx.event
-async def on_ready():
-    # Register the global blacklist check
-    merx.add_check(global_blacklist_check)
-    print(f"{merx.user} is now ready!")
+    
 
 
 def run():
