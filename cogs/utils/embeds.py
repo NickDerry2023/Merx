@@ -29,7 +29,7 @@ class ErrorEmbed(discord.Embed):
     def __init__(self, error: Exception, error_id: str):
         super().__init__(
             title="Error Occurred",
-            description=f"**Error ID:** `{error_id}`\n\n**Error Message:** ||{str(error)}||\n\n",
+            description=f"**Error ID:** `{error_id}`\n\n**Error Message:** {str(error)}\n\n",
             color=discord.Color.red()
         )
         self.add_field(
