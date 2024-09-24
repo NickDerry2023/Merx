@@ -144,13 +144,16 @@ class ExitSetupEmbed(discord.Embed):
 
 class AboutEmbed:
     @staticmethod
-    def create_info_embed(uptime, guilds, users, latency, version, bot_name, bot_icon, thumbnail_url):
+    def create_info_embed(uptime, guilds, users, latency, version, bot_name, bot_icon, shards, cluster, environment, command_run_time, thumbnail_url):
         embed = discord.Embed(
             description=(
                 "Merx is an exceptional moderation and management tool designed specifically for community servers."
             ),
             color=discord.Color.from_str('#2a2c30')
         )
+
+
+        embed.add_field(name="",value=(""),inline=False)
 
 
         embed.add_field(
@@ -161,19 +164,27 @@ class AboutEmbed:
                 f"> **Uptime:** <t:{int((uptime.timestamp()))}:R>\n"
                 f"> **Latency:** {round(latency * 1000)}ms"
             ),
-            inline=False
+            inline=True
         )
 
 
         embed.add_field(
             name="System Information",
             value=(
-                f"> **Discord API Wrapper:** discord.py {discord.__version__}\n"
-                f"> **Database System:** MongoDB {version}\n"
+                f"> **Language:** Python\n"
+                f"> **Database:** MongoDB {version}\n"
                 f"> **Host OS:** {platform.system()}\n"
                 f"> **Host:** Cali Web Design"
             ),
-            inline=False
+            inline=True
+        )
+        
+        
+        embed.add_field(name="",value=(""),inline=False)
+        
+        
+        embed.set_footer(
+            text=f"Cluster {cluster} | Shard {shards} | {environment} • {command_run_time}"
         )
 
 
@@ -190,25 +201,10 @@ class AboutWithButtons:
     def create_view():
         view = View()
 
-        async def commands_callback(interaction: discord.Interaction):
-            await interaction.response.defer()
-            help_command = interaction.client.get_command('help')
-            
-            
-            if help_command:
-                await help_command(interaction)
-            else:
-                await interaction.response.send_message("Help command not found.", ephemeral=True)
-
-
-        commands_button = Button(label="Commands", row=0, style=discord.ButtonStyle.primary, custom_id='commands_button')
-        commands_button.callback = commands_callback
-        view.add_item(commands_button)
-        
 
         support_server_button = Button(
             label="Support Server", 
-            style=discord.ButtonStyle.link, 
+            style=discord.ButtonStyle.primary, 
             url="https://discord.gg/nAX4yhVEgy"
         )
         
@@ -216,7 +212,7 @@ class AboutWithButtons:
         invite_button = Button(
             label="Invite Merx", 
             style=discord.ButtonStyle.link, 
-            url="https://discord.com/oauth2/authorize?client_id=1285105979947749406&permissions=8&integration_type=0&scope=bot"
+            url="https://discord.com/oauth2/authorize?client_id=1285105545078116453&permissions=8&integration_type=0&scope=bot"
         )
 
 
@@ -346,15 +342,21 @@ class ServerInformationEmbed:
         # Add fields to the embed
         
         embed.set_thumbnail(url=icon_url)
-        embed.add_field(name="Server Owner", value=f"{owner}", inline=False)
-        embed.add_field(name="Member Count", value=f"{member_count}", inline=False)
-        embed.add_field(name="Creation Date", value=f"{created_at}", inline=False)
-        embed.add_field(name="Verification Level", value=f"{verification_level}", inline=False)
-        embed.add_field(name="2FA Status", value=f"{two_factor_auth}", inline=False)
-        embed.add_field(name="Explicit Content Filter", value=f"{explicit_content_filter}", inline=False)
+        embed.add_field(
+            name="**Generic Information**", 
+            value=f"> **Server Owner:** {owner}\n"
+                  f"> **Member Count:** {member_count}\n"
+                  f"> **Creation Date:** {created_at}\n"
+                  f"> **Verification Level:** {verification_level}\n"
+                  f"> **2FA Status:** {two_factor_auth}\n"
+                  f"> **Explicit Content Filter:** {explicit_content_filter}", 
+            inline=False
+        )
+        
+        
         embed.add_field(
             name="Channels",
-            value=f"Text: {text_channels}\nVoice: {voice_channels}\nAnnouncements: {announcement_channels}\nForum: {forum_channels}",
+            value=f"> Text: {text_channels}\n > Voice: {voice_channels}\n > Announcements: {announcement_channels}\n > Forum: {forum_channels}",
             inline=False
         )
 
@@ -377,7 +379,7 @@ class ServerInformationEmbed:
 
         # Boost info
         
-        embed.add_field(name="Boosts", value=f"{boosts} (Tier {boost_tier})", inline=False)
+        embed.add_field(name="Boosts", value=f"> {boosts} (Tier {boost_tier})", inline=False)
 
 
         return embed
@@ -406,3 +408,104 @@ class SearchResultEmbed(discord.Embed):
         self.add_field(name="Case Number", value=case_number, inline=False)
         self.add_field(name="Collection", value=collection, inline=False)
         self.add_field(name="Details", value=details, inline=False)
+        
+      
+ 
+# This contains the emebed and its parameters for the ping command. This shows things like uptime,
+# latency to discors and mongodb.        
+        
+class PingCommandEmbed(discord.Embed):
+    def create_ping_embed(latency, websocket_latency, database_latency, uptime, version):
+        embed = discord.Embed(
+            title="",
+            color=discord.Color.green()
+        )
+
+        
+        embed.add_field(
+            name="**🏓 Pong!**", 
+            value=f"> **Latency:** {round(latency * 1000)}ms\n"
+                  f"> **Websocket Latency:** {websocket_latency}ms\n"
+                  f"> **Database Latency:** {database_latency}ms\n"
+                  f"> **Uptime:** <t:{int((uptime.timestamp()))}:R>\n"
+                  f"> **Build Version:** {version}\n",
+            inline=False
+        )
+
+
+        return embed
+    
+    
+    
+# This is the embed for User Information command also known as whois. 
+
+class UserInformationEmbed:
+    def __init__(self, member, constants):
+        self.member = member
+        self.constants = constants
+
+
+
+    def create_embed(self):
+
+
+        user_mention = self.member.mention
+        display_name = self.member.display_name
+        user_id = self.member.id
+        account_created = self.member.created_at.strftime("%B %d, %Y %I:%M %p")
+        joined_server = self.member.joined_at.strftime("%B %d, %Y %I:%M %p") if self.member.joined_at else "N/A"
+        roles = [role.mention for role in self.member.roles if role.name != "@everyone"]
+        role_count = len(roles)
+        
+        
+        badges = []
+        flags = self.member.public_flags
+
+
+        if flags.hypesquad_bravery:
+            badges.append("> <:houseBravery:1287991028950761523> HypeSquad Bravery")
+        if flags.hypesquad_brilliance:
+            badges.append("> <:houseBrilliance:1287990589773840416> HypeSquad Brilliance")
+        if flags.hypesquad_balance:
+            badges.append("> <:houseBalance:1287990232591106069> HypeSquad Balance")
+        if flags.verified_bot:
+            badges.append("> <:verified:1287994141036384330> Verified Bot")
+        if flags.early_supporter:
+            badges.append("> <:EarlyVerifiedDeveloperBadge:1287990726751162368> Early Supporter")
+        if flags.active_developer:
+            badges.append("> <:DeveloperBadge:1287990849640075318> Active Developer")
+
+
+        embed = discord.Embed(
+            title=f"User Info - {display_name}",
+            color=self.constants.merx_embed_color_setup(),
+            timestamp=datetime.utcnow()
+        )
+
+
+        embed.add_field(
+            name="**User Information**", 
+            value=f"> **Mention:** {user_mention}\n"
+                  f"> **Display Name:** {display_name}\n"
+                  f"> **User ID:** {user_id}\n"
+                  f"> **Account Created:** {account_created}\n"
+                  f"> **Joined Server:** {joined_server}", 
+            inline=False
+        )
+
+
+        if badges:
+            embed.add_field(name="Badges", value='\n'.join(badges), inline=False)
+        else:
+            embed.add_field(name="Badges", value="No badges", inline=False)
+            
+
+        embed.add_field(name=f"Roles ({role_count})", value=', '.join(roles) if roles else "No Roles", inline=False)
+
+
+        if self.member.bot:
+            embed.set_footer(text="This user is a bot.")
+            
+
+        return embed
+    

@@ -26,7 +26,7 @@ class CaseSearchCog(commands.Cog):
             return
 
 
-        collections = ['warn_collection', 'blacklist_collection', 'ban_collection']
+        collections = ['warns', 'blacklists', 'ban_collection']
         found_cases = []
 
 
@@ -70,14 +70,23 @@ class CaseSearchCog(commands.Cog):
                     mod_name = result.get('banned_by_name', 'N/A')
                     
                     
-                elif collection_name == "blacklist_collection":
+                elif collection_name == "blacklists":
                     
                     
-                    user_id = result.get('blacklisted_user_id', 'N/A')
-                    user_name = result.get('blacklisted_user_name', 'N/A')
-                    mod_id = result.get('blacklisted_by_id', 'N/A')
-                    mod_name = result.get('blacklisted_by_name', 'N/A')
+                    user_id = result.get('discord_id', 'N/A')
+                    user_name = 'NOT PART OF COMMAND'
+                    mod_id = '0'
+                    mod_name = 'NOT PART OF COMMAND'
                     
+                    
+                elif collection_name == "warns":
+                    
+                    
+                    user_id = result.get('warned_user_id', 'N/A')
+                    user_name = result.get('warned_user_name', 'N/A')
+                    mod_id = result.get('warned_by_id', 'N/A')
+                    mod_name = result.get('warned_by_name', 'N/A')
+                
                     
                 else:
                     

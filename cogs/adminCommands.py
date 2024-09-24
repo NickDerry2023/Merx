@@ -3,7 +3,7 @@ import asyncio
 import uuid
 import shortuuid
 from discord.ext import commands
-from cogs.utils.embeds import DebugEmbed
+from cogs.utils.embeds import DebugEmbed, PermissionDeniedEmbed
 from cogs.utils.constants import MerxConstants
 
 
@@ -22,6 +22,16 @@ class AdminCommandsCog(commands.Cog):
 
     @commands.hybrid_command(name="debug", description="Displays debug information for the Merx.", with_app_command=True, extras={"category": "Debugging"})
     async def debug(self, ctx: commands.Context):
+        
+        
+        # Check if the user running the command has the required role
+        
+        merx_team_role = discord.utils.get(ctx.author.roles, id=1285107029093912637)
+        developer_role = discord.utils.get(ctx.author.roles, id=1285107029093912638)
+        
+        if not merx_team_role or developer_role:
+            await ctx.send("<:xmark:1285350796841582612> You do not have the required role to use this command.")
+            return
         
         
         # Displays debugging information.
@@ -45,6 +55,22 @@ class AdminCommandsCog(commands.Cog):
     @commands.hybrid_command(name="addowner", description="Add a user to the bypassed list.", with_app_command=True, extras={"category": "Debugging"})
     @commands.has_permissions(administrator=True)
     async def addowner(self, ctx: commands.Context, user: discord.User):
+        
+        
+        # Check if the command is run in the correct guild
+        
+        if ctx.guild.id != 1285107028892717118:
+            await ctx.send("<:xmark:1285350796841582612> This command can only be used in the Merx server.")
+            return
+        
+
+        # Check if the user running the command has the required role
+        
+        role = discord.utils.get(ctx.author.roles, id=1285107029093912637)
+        
+        if not role:
+            await ctx.send("<:xmark:1285350796841582612> You do not have the required role to use this command.")
+            return
         
         
         # Check if the user is already in the bypass list
@@ -79,6 +105,23 @@ class AdminCommandsCog(commands.Cog):
     @commands.hybrid_command(name="removeowner", description="Remove a user from the bypassed list.", with_app_command=True, extras={"category": "Debugging"})
     @commands.has_permissions(administrator=True)
     async def removeowner(self, ctx: commands.Context, user: discord.User):
+        
+        
+        # Check if the command is run in the correct guild
+        
+        if ctx.guild.id != 1285107028892717118:
+            await ctx.send("<:xmark:1285350796841582612> This command can only be used in the Merx server.")
+            return
+        
+
+        # Check if the user running the command has the required role
+        
+        role = discord.utils.get(ctx.author.roles, id=1285107029093912637)
+        
+        if not role:
+            await ctx.send("<:xmark:1285350796841582612> You do not have the required role to use this command.")
+            return
+        
         
         # Always refresh the bypassed users list before performing the check
         
@@ -153,6 +196,22 @@ class AdminCommandsCog(commands.Cog):
 
     @commands.hybrid_command(name="unblacklist", description="Remove a user or guild from the blacklist.", with_app_command=True, extras={"category": "Administration"})
     async def unblacklist(self, ctx: commands.Context, id: str, entity_type: str, reason: str = "No reason provided."):
+        
+        
+        # Check if the command is run in the correct guild
+        
+        if ctx.guild.id != 1285107028892717118:
+            await ctx.send("<:xmark:1285350796841582612> This command can only be used in the Merx server.")
+            return
+        
+
+        # Check if the user running the command has the required role
+        
+        role = discord.utils.get(ctx.author.roles, id=1285107029093912637)
+        
+        if not role:
+            await ctx.send("<:xmark:1285350796841582612> You do not have the required role to use this command.")
+            return
         
         
         # Checks to see if the user is bypassed and bot owner. Then it checks to see if you pass
@@ -261,6 +320,22 @@ class AdminCommandsCog(commands.Cog):
     async def blacklist(self, ctx: commands.Context, id: str, entity_type: str):
         
         
+        # Check if the command is run in the correct guild
+        
+        if ctx.guild.id != 1285107028892717118:
+            await ctx.send("<:xmark:1285350796841582612> This command can only be used in the Merx server.")
+            return
+        
+
+        # Check if the user running the command has the required role
+        
+        role = discord.utils.get(ctx.author.roles, id=1285107029093912637)
+        
+        if not role:
+            await ctx.send("<:xmark:1285350796841582612> You do not have the required role to use this command.")
+            return
+        
+        
         # Checks to see if the user is bypassed and bot owner. Then it checks to see if you pass
         # the righr parmeter.
         
@@ -293,7 +368,7 @@ class AdminCommandsCog(commands.Cog):
                     await self.send_message(ctx, f"<:xmark:1285350796841582612> {user.mention} is already blacklisted.")
                     return
 
-                await collection.insert_one({"discord_id": user.id, "type": "user"})
+                await collection.insert_one({"discord_id": user.id, "type": "user", "case_number": case_number})
                 await self.send_message(ctx, f"<:whitecheck:1285350764595773451> **{case_number} - {user.mention}** has been blacklisted.")
             
             
@@ -320,7 +395,7 @@ class AdminCommandsCog(commands.Cog):
                 return
 
 
-            await collection.insert_one({"discord_id": guild_id, "type": "guild"})
+            await collection.insert_one({"discord_id": guild_id, "type": "guild", "case_number": case_number})
             await self.send_message(ctx, f"<:whitecheck:1285350764595773451> **{case_number} - Guild ID {id}** has been blacklisted.")
 
 

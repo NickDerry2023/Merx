@@ -102,3 +102,9 @@ class MerxConstants:
     def merx_embed_color_setup(self):
         DEFAULT_EMBED_COLOR = discord.Color.from_str('#dfa4ff')
         return DEFAULT_EMBED_COLOR
+
+
+    # Gets the bots type either production or development
+
+    def merx_environment_type(self):
+        return os.getenv('ENVIRONMENT')

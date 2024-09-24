@@ -11,31 +11,31 @@ from cogs.utils.embeds import ErrorEmbed, PermissionDeniedEmbed
 from cogs.utils.errors import send_error_embed
 
 
-CHANNEL_NAME_FOR_WELCOME = ["chat", "general"]
-
-
 class MerxEvents(commands.Cog):
     def __init__(self, merx):
         self.merx = merx
 
     @commands.Cog.listener()
-    async def on_ready(self, ctx: commands.Context = None):
-        await self.merx.change_presence(activity=discord.Activity(name="help | merxbot.xyz", type=discord.ActivityType.watching))
-        print(self.merx.user.name + " is ready.")
+    async def on_ready(self):
+        guild_count = len(self.merx.guilds)
+        user_count = sum(guild.member_count for guild in self.merx.guilds)
+
+
+        await self.merx.change_presence(activity=discord.Activity(
+            name=f"{guild_count} Guilds • {user_count:,} Users • /help",
+            type=discord.ActivityType.watching
+        ))
+        
+
+        print(f"{self.merx.user.name} is ready with {guild_count} guilds and {user_count:,} users.")
             
-    
+
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
-        welcome_channel = None
-        for channel_name in CHANNEL_NAME_FOR_WELCOME:
-            welcome_channel = discord.utils.get(member.guild.text_channels, name=channel_name)
-            if welcome_channel:
-                break
-        
+        welcome_channel = discord.utils.get(member.guild.text_channels, name="general")
         if welcome_channel:
             member_count = member.guild.member_count
             await welcome_channel.send(f"{member.mention} Welcome to **{member.guild.name}**! Feel free to explore. We now have **{member_count}** members. 🎉")        
-        
 
 
     # This handles the permission denied and error embeds. It also generates

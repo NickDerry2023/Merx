@@ -19,32 +19,94 @@ class ClearChatCog(commands.Cog):
     
     @commands.hybrid_command(name="purge", description="Clear a large number of messages from the current channel.", with_app_command=True, extras={"category": "General"})
     @commands.has_permissions(administrator=True)
-    @commands.cooldown(1, 2, commands.BucketType.user)  # Apply the cooldown here
-    async def purge(self, ctx, amount: int):
+    @commands.cooldown(1, 2, commands.BucketType.user)
+    async def purge(self, ctx, option: str, limit: int, *, user: discord.User = None):
+        
+        await ctx.interaction.response.defer()
+
+
+        if limit < 1:
+            await ctx.send("Please specify a valid number of messages to delete (greater than 0).")
+            return
         
         
-        # This checks to see if the user specified the amount of messages to delete.
-        # this prevents an empty number from being sent.
-        
-        if amount < 1:
-            await ctx.send("Please specify a number of messages to delete.")
+        if option.lower() not in ["all", "bots", "user", "merx"]:
+            await ctx.send("Invalid option! Use `all`, `bots`, `user`, or `merx`.")
             return
 
 
         try:
-            await ctx.channel.purge(limit=amount)
+            if option.lower() == "all":
+                
+                
+                deleted = await ctx.channel.purge(limit=limit)
+                
+                
+                embed = SuccessEmbed(
+                    title="Messages Cleared",
+                    description=f"<:whitecheck:1285350764595773451> Cleared {len(deleted)} messages from this channel."
+                )
             
-            embed = SuccessEmbed(
-                title="Messages Cleared",
-                description=f"Cleared {amount} messages from this channel."
-            )
             
+            elif option.lower() == "bots":
+                
+                
+                deleted = await ctx.channel.purge(limit=limit, check=lambda m: m.author.bot)
+                
+                
+                embed = SuccessEmbed(
+                    title="Bot Messages Cleared",
+                    description=f"<:whitecheck:1285350764595773451> Cleared {len(deleted)} bot messages from this channel."
+                )
+            
+            
+            elif option.lower() == "user":
+                
+                
+                if user is None:
+                    await ctx.send("Please specify a user to purge messages from.")
+                    return
+                
+                
+                deleted = await ctx.channel.purge(limit=limit, check=lambda m: m.author.id == user.id)
+                
+                
+                embed = SuccessEmbed(
+                    title="User Messages Cleared",
+                    description=f"<:whitecheck:1285350764595773451> Cleared {len(deleted)} messages from {user.mention}."
+                )
+            
+            
+            elif option.lower() == "merx":
+                
+                
+                deleted = await ctx.channel.purge(limit=limit, check=lambda m: m.author.id == self.merx.user.id)
+                
+                
+                embed = SuccessEmbed(
+                    title="Merx Messages Cleared",
+                    description=f"<:whitecheck:1285350764595773451> Cleared {len(deleted)} messages from Merx."
+                )
+                
+
             await ctx.send(embed=embed)
-        
         
         
         except discord.Forbidden:
             await ctx.send(embed=ErrorEmbed())
+            
+            
+        except discord.HTTPException as e:
+            await ctx.send(f"An error occurred while trying to purge messages: {str(e)}")
+
+        
+        
+        except discord.Forbidden:
+            await ctx.send(embed=ErrorEmbed())
+            
+            
+        except discord.HTTPException as e:
+            await ctx.send(f"An error occurred while trying to purge messages: {str(e)}")
     
     
     
