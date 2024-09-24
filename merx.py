@@ -21,6 +21,7 @@ class Merx(commands.AutoShardedBot):
         self.start_time = datetime.utcnow()
         
         
+        
     # Use bypassed users from the constants class instead of hardcoding them
     # The constants.py file will get the IDs from MongoDb allowing bot owners
     # to remove and add users.
@@ -29,6 +30,7 @@ class Merx(commands.AutoShardedBot):
         if not constants.bypassed_users:
             await constants.fetch_bypassed_users()
         return user.id in constants.bypassed_users
+
 
 
     # Sets up the cogs for Merx. This will cycle thru the cogs folder and
@@ -42,10 +44,11 @@ class Merx(commands.AutoShardedBot):
         print('All cogs loaded successfully!')
         
         
+        
     async def refresh_blacklist_periodically(self):
         while True:
             await self.constants.refresh_blacklists()
-            await asyncio.sleep(3600)  # Refresh every hour
+            await asyncio.sleep(3600)
 
 
 # Sets the bot's intents. This uses the members intent, default intents, and message_content
@@ -70,63 +73,72 @@ merx = Merx(command_prefix=prefix,
             allowed_mentions=discord.AllowedMentions(replied_user=True, everyone=True, roles=True))
 
 
+
+# Function to check the blacklistec guilds or user from MongoDB.
+
+async def global_blacklist_check(ctx):
+    
+    
+    constants = ctx.bot.constants
+    
+
+    # Fetch blacklist if not already fetched or periodically
+    
+    if not constants.blacklists:
+        await constants.fetch_blacklisted_users()
+
+    if not constants.server_blacklists:
+        await constants.fetch_blacklisted_guilds()
+
+
+    # Check if the user is blacklisted
+    
+    if ctx.author.id in constants.blacklists and ctx.command.name != "unblacklist":
+        
+        em = discord.Embed(
+            title="Blacklisted",
+            description="You are blacklisted from Merx - please appeal within our [support server](https://discord.gg/nAX4yhVEgy)!",
+            color=discord.Color(int('fecb02', 16)),
+        )
+        
+        await ctx.send(embed=em)
+        
+        raise commands.CheckFailure("You are blacklisted from using this bot.")
+
+
+    # Check if the guild is blacklisted
+    
+    if ctx.guild and ctx.guild.id in constants.server_blacklists and ctx.command.name != "guild_unblacklist":
+        
+        em = discord.Embed(
+            title="Blacklisted Guild",
+            description="This server is blacklisted from Merx - please appeal within our [support server](https://discord.gg/nAX4yhVEgy)!",
+            color=discord.Color(int('fecb02', 16)),
+        )
+        
+        await ctx.send(embed=em)
+        
+        raise commands.CheckFailure("This guild is blacklisted from using the bot.")
+
+
+    # Prevent the command from being run in DMs
+    
+    if ctx.guild is None:
+        raise commands.NoPrivateMessage("This command cannot be used in private messages.")
+
+    return True
+
+
+
+
 # Before invoking any command, check blacklist.
 
-@merx.before_invoke
 async def before_invoke(ctx):
-
+    # Skip check if the user is in the bypass list
     if ctx.author.id in constants.bypassed_users:
         return
-
-
-    # User blacklist check
-    # This is the unblacklist block to check if users are blacklisted and unblacklisted.
-    
-    def global_blacklist_check():
-        async def predicate(ctx):
-            constants = ctx.bot.constants
-
-
-            # Fetch blacklist if not already fetched or periodically
-            if not constants.blacklists:
-                await constants.fetch_blacklisted_users()
-            
-            if not constants.server_blacklists:
-                await constants.fetch_blacklisted_guilds()
-
-
-            # Check if the user is blacklisted
-            
-            if ctx.author.id in constants.blacklists and ctx.command.name != "unblacklist":
-                em = discord.Embed(
-                    title="Blacklisted",
-                    description="You are blacklisted from Merx - please appeal within our [support server](https://discord.gg/nAX4yhVEgy)!",
-                    color=discord.Color(int('fecb02', 16)),
-                )
-                await ctx.send(embed=em)
-                raise commands.CheckFailure("You are blacklisted from using this bot.")
-
-
-            # Check if the guild is blacklisted
-            
-            if ctx.guild and ctx.guild.id in constants.server_blacklists and ctx.command.name != "guild_unblacklist":
-                em = discord.Embed(
-                    title="Blacklisted Guild",
-                    description="This server is blacklisted from Merx - please appeal within our [support server](https://discord.gg/nAX4yhVEgy)!",
-                    color=discord.Color(int('fecb02', 16)),
-                )
-                await ctx.send(embed=em)
-                raise commands.CheckFailure("This guild is blacklisted from using the bot.")
-
-
-            # Prevent the command from being run in DMs
-            
-            if ctx.guild is None:
-                raise commands.NoPrivateMessage("This command cannot be used in private messages.")
-            
-            
-            return True
-        return commands.check(predicate)
+    # Run the blacklist check
+    await global_blacklist_check(ctx)
 
 
 
@@ -142,6 +154,7 @@ def run():
     )
 
     merx.run(constants.merx_token_setup())
+
 
 
 if __name__ == "__main__":
