@@ -78,9 +78,6 @@ merx = Merx(command_prefix=prefix,
 
 async def global_blacklist_check(ctx):
     
-    
-    constants = ctx.bot.constants
-    
 
     # Fetch blacklist if not already fetched or periodically
     
