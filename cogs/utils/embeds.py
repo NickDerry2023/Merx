@@ -452,8 +452,8 @@ class UserInformationEmbed:
         user_mention = self.member.mention
         display_name = self.member.display_name
         user_id = self.member.id
-        account_created = self.member.created_at.strftime("%B %d, %Y %I:%M %p")
-        joined_server = self.member.joined_at.strftime("%B %d, %Y %I:%M %p") if self.member.joined_at else "N/A"
+        account_created = f"<t:{int(self.member.created_at.timestamp())}:F>"
+        joined_server = f"<t:{int(self.member.joined_at.timestamp())}:F>" if self.member.joined_at else "N/A"
         roles = [role.mention for role in self.member.roles if role.name != "@everyone"]
         role_count = len(roles)
         
