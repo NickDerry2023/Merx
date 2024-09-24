@@ -40,8 +40,6 @@ class Merx(commands.AutoShardedBot):
                 await self.load_extension(f'cogs.{filename[:-3]}')
         await self.load_extension('cogs.utils.hot_reload')
         print('All cogs loaded successfully!')
-        await constants.refresh_blacklists()
-        self.add_check(global_blacklist_check())
         
         
     async def refresh_blacklist_periodically(self):
