@@ -119,7 +119,7 @@ class MerxConstants:
             
             
         try:
-            collection = self.mongo_db["blacklist"]
+            collection = self.mongo_db["blacklists"]
             cursor = collection.find({}, {"discord_id": 1})
             
             
@@ -144,7 +144,7 @@ class MerxConstants:
             
             
         try:
-            collection = self.mongo_db["guild_blacklist"]
+            collection = self.mongo_db["blacklists"]
             cursor = collection.find({}, {"guild_id": 1})
             server_blacklists = []
             
