@@ -22,7 +22,8 @@ class ClearChatCog(commands.Cog):
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def purge(self, ctx, option: str, limit: int, *, user: discord.User = None):
         
-        await ctx.interaction.response.defer()
+        if hasattr(ctx, "interaction") and ctx.interaction is not None:
+            await ctx.interaction.response.defer()
 
 
         if limit < 1:

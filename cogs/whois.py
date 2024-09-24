@@ -18,7 +18,6 @@ class WhoisCommandCog(commands.Cog):
 
 
     @commands.hybrid_command(description="Check to see information about users and bots.", with_app_command=True, extras={"category": "General"})
-    @commands.has_permissions(administrator=True)
     async def whois(self, ctx, member: discord.Member = None):
 
 
