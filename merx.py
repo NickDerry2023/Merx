@@ -84,6 +84,7 @@ async def before_invoke(ctx):
     await global_blacklist_check(ctx)
     
     
+    
 async def global_blacklist_check(ctx):
     
 
@@ -132,6 +133,7 @@ async def global_blacklist_check(ctx):
         raise commands.NoPrivateMessage("This command cannot be used in private messages.")
 
     return True
+
 
 
 def run():
