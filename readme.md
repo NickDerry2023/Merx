@@ -1,29 +1,48 @@
-## Merx - Discord Moderation Bot
+# **Merx - The Ultimate Discord Moderation Bot**
 
-Merx is an exceptional moderation and management tool designed specifically for Discord community servers. With just a simple command or message prompt, Merx efficiently handles all aspects of server management, making it an invaluable asset for keeping your server organized and running smoothly.
+Merx is a powerful, open-source moderation and server management tool designed to bring order and efficiency to your Discord community. With a robust suite of commands, Merx takes care of moderation tasks in a few keystrokes, allowing admins and moderators to focus on building a positive environment.
 
-## Features
+## :star2: **Features**
 
-- **Purge Command**: Quickly and efficiently delete large quantities of messages with the `purge` command.
-- **Warn Command**: Warn members easily with the `warn` command and maintain a log for future reference.
-- **Ban & Unban Commands**: Use `ban` and `unban` to manage disruptive users in your server.
-- **Nickname Command**: Change or reset member nicknames with ease using the `nickname` command.
-- **Admin Management Commands**: Add or remove bot owners and administrators with a single command.
-- **Sync Command**: Instantly sync all slash commands across your server using the `sync` command.
-- **Open Source**: Merx is fully open-source and customizable for your needs.
+- **Message Purge**: Quickly clean up unwanted or spam messages with the `/purge` command.
+- **User Warnings**: Issue warnings to members with `/warn`, while keeping a detailed log of all warnings for future reference.
+- **Ban & Unban**: Easily manage disruptive users using `/ban` and `/unban` commands.
+- **Nickname Management**: Modify or reset user nicknames seamlessly with `/nickname`.
+- **Admin Control**: Effortlessly assign or revoke admin roles and bot ownership through the `/admin` command suite.
+- **Global Sync**: Synchronize slash commands across your server in real-time with `/sync`.
+- **Fully Customizable**: Being open-source, Merx offers the flexibility to adapt and expand its features to suit your server’s unique needs.
 
-## Getting Started
+## :rocket: **Getting Started**
 
 ### Prerequisites
 
-Ensure you have the following installed:
+To run Merx, ensure you have the following installed:
 
-- [Python 3.8+](https://www.python.org/downloads/)
-- [discord.py](https://pypi.org/project/discord.py/)
+- **[Python 3.8+](https://www.python.org/downloads/)**: Modern and efficient to ensure compatibility with the latest features.
+- **[discord.py](https://pypi.org/project/discord.py/)**: A powerful library for creating Discord bots in Python.
 
 ### Installation
 
-1. **Clone the repository**: `bash git clone https://github.com/your-username/merx.git`
-2. **Install Requirements**: `pip install -r requirements.txt`
-3. **Update .env**: Update the env file with your prefix, database information, token and sentry dsn.
-4. **Run the bot**: `python3 main.py`
+1. **Clone the Repository**  
+   ```bash
+   git clone https://github.com/your-username/merx.git
+   ```
+2. **Install Dependencies**  
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Configure Environment**  
+   Update your `.env` file with the required bot token, database information, and other necessary credentials.
+
+4. **Run the Bot**  
+   ```bash
+   python3 main.py
+   ```
+
+## :globe_with_meridians: **Contributing**
+
+We welcome contributions from the community! Feel free to fork the project, submit issues, or make pull requests. Help make Merx even better!
+
+## :page_facing_up: **License**
+
+This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
