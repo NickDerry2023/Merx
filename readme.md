@@ -45,4 +45,4 @@ We welcome contributions from the community! Feel free to fork the project, subm
 
 ## :page_facing_up: **License**
 
-This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
+This project is licensed under the COMMON DEVELOPMENT AND DISTRIBUTION License – see the [LICENSE](LICENSE) file for details.
