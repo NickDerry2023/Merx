@@ -25,7 +25,7 @@ To run Merx, ensure you have the following installed:
 
 1. **Clone the Repository**  
    ```bash
-   git clone https://github.com/your-username/merx.git
+   git clone https://github.com/NickDerry2023/Merx.git
    ```
 2. **Install Dependencies**  
    ```bash
