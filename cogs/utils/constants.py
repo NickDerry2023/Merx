@@ -145,12 +145,12 @@ class MerxConstants:
             
         try:
             collection = self.mongo_db["blacklists"]
-            cursor = collection.find({}, {"guild_id": 1})
+            cursor = collection.find({}, {"discord_id": 1})
             server_blacklists = []
             
             
             async for document in cursor:
-                server_blacklists.append(document["guild_id"])
+                server_blacklists.append(document["discord_id"])
             self.server_blacklists = server_blacklists
             
             
