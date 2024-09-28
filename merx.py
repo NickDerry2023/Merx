@@ -91,11 +91,8 @@ async def global_blacklist_check(ctx):
 
     # Fetch blacklist if not already fetched or periodically
     
-    if not constants.blacklists:
-        await constants.fetch_blacklisted_users()
-
-    if not constants.server_blacklists:
-        await constants.fetch_blacklisted_guilds()
+    await constants.fetch_blacklisted_users()
+    await constants.fetch_blacklisted_guilds()
 
 
     # Check if the user is blacklisted
