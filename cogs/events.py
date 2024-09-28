@@ -18,6 +18,8 @@ class MerxEvents(commands.Cog):
     def __init__(self, merx):
         self.merx = merx
         self.change_status.start()
+        self.blacklist_change.start()
+        self.jsk_owner_change.start()
         
         
     
@@ -37,6 +39,7 @@ class MerxEvents(commands.Cog):
 
 
 
+
     # This updated the guilds and users periodically every 30 seconds.
 
     @tasks.loop(seconds=30)
@@ -50,6 +53,26 @@ class MerxEvents(commands.Cog):
             type=discord.ActivityType.watching
         ))
         
+        
+        
+    @tasks.loop(seconds=2)
+    async def blacklist_change(ctx):
+        # Skip check if the user is in the bypass list
+        if ctx.author.id in constants.bypassed_users:
+            return
+        # Run the blacklist check
+        await global_blacklist_check(ctx)
+        
+        
+        
+    
+    @tasks.loop(seconds=2)
+    async def jsk_owner_change(ctx):
+        if not constants.bypassed_users:
+            await constants.fetch_bypassed_users()
+        return user.id in constants.bypassed_users
+        
+            
             
 
     @commands.Cog.listener()
@@ -64,6 +87,7 @@ class MerxEvents(commands.Cog):
         if welcome_channel:
             member_count = member.guild.member_count
             await welcome_channel.send(f"{member.mention} Welcome to **{member.guild.name}**! Feel free to explore. We now have **{member_count}** members. 🎉")         
+
 
 
     # This handles the permission denied and error embeds. It also generates
@@ -84,6 +108,7 @@ class MerxEvents(commands.Cog):
             await ctx.send(embed=ErrorEmbed(error=error, error_id=error_id))
 
 
+
     # These are the cog error handlers they determine how the error is sent.
 
     @commands.Cog.listener()
@@ -94,6 +119,7 @@ class MerxEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_application_command_error(self, interaction: discord.Interaction, error):
         await self.handle_error(interaction, error)
+
 
 
 async def setup(merx):
