@@ -76,6 +76,7 @@ merx = Merx(command_prefix=prefix,
 
 # Before invoking any command, check blacklist.
 
+@merx.before_invoke
 async def before_invoke(ctx):
     # Skip check if the user is in the bypass list
     if ctx.author.id in constants.bypassed_users:
