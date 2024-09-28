@@ -17,9 +17,30 @@ CHANNEL_NAME_FOR_WELCOME = ["chat", "general"]
 class MerxEvents(commands.Cog):
     def __init__(self, merx):
         self.merx = merx
-
+        self.change_status.start()
+        
+        
+    
+    # This starts the activity and gets the users and guilds and sets it initally.
+    
     @commands.Cog.listener()
     async def on_ready(self):
+        guild_count = len(self.merx.guilds)
+        user_count = sum(guild.member_count for guild in self.merx.guilds)
+
+        await self.merx.change_presence(activity=discord.Activity(
+            name=f"{guild_count} Guilds • {user_count:,} Users • /help",
+            type=discord.ActivityType.watching
+        ))
+
+        print(f"{self.merx.user.name} is ready with {guild_count} guilds and {user_count:,} users.")
+
+
+
+    # This updated the guilds and users periodically every 30 seconds.
+
+    @tasks.loop(seconds=30)
+    async def change_status(self):
         guild_count = len(self.merx.guilds)
         user_count = sum(guild.member_count for guild in self.merx.guilds)
 
@@ -28,8 +49,7 @@ class MerxEvents(commands.Cog):
             name=f"{guild_count} Guilds • {user_count:,} Users • /help",
             type=discord.ActivityType.watching
         ))
-
-        print(f"{self.merx.user.name} is ready with {guild_count} guilds and {user_count:,} users.")
+        
             
 
     @commands.Cog.listener()
