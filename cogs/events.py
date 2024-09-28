@@ -9,9 +9,11 @@ from discord.ext import tasks, commands
 from discord.ext.commands.context import Context
 from cogs.utils.embeds import ErrorEmbed, PermissionDeniedEmbed
 from cogs.utils.errors import send_error_embed
+from cogs.utils.constants import MerxConstants
 
 
 CHANNEL_NAME_FOR_WELCOME = ["chat", "general"]
+constants = MerxConstants()
 
 
 class MerxEvents(commands.Cog):
