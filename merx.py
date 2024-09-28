@@ -105,7 +105,7 @@ async def global_blacklist_check(ctx):
         em = discord.Embed(
             title="Blacklisted",
             description="You are blacklisted from Merx - please appeal within our [support server](https://discord.gg/nAX4yhVEgy)!",
-            color=discord.Color(int('fecb02', 16)),
+            color=constants.merx_embed_color_setup(),
         )
         
         await ctx.send(embed=em)
@@ -120,7 +120,7 @@ async def global_blacklist_check(ctx):
         em = discord.Embed(
             title="Blacklisted Guild",
             description="This server is blacklisted from Merx - please appeal within our [support server](https://discord.gg/nAX4yhVEgy)!",
-            color=discord.Color(int('fecb02', 16)),
+            color=constants.merx_embed_color_setup(),
         )
         
         await ctx.send(embed=em)
