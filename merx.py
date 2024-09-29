@@ -27,8 +27,7 @@ class Merx(commands.AutoShardedBot):
     # to remove and add users.
         
     async def is_owner(self, user: discord.User):
-        if not constants.bypassed_users:
-            await constants.fetch_bypassed_users()
+        await constants.fetch_bypassed_users()
         return user.id in constants.bypassed_users
 
 
