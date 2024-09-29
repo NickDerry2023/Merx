@@ -26,7 +26,7 @@ class BanCommandCog(commands.Cog):
             await ctx.send("<:xmark:1285350796841582612> Failed to connect to the database. Please try again later.", ephemeral=True)
             return
         
-        ban_collection = mongo_db["ban_collection"]
+        bans = mongo_db["bans"]
         
         # Bans a member from the server with an optional reason.
         # Check if the user has administrator permissions
@@ -96,7 +96,7 @@ class BanCommandCog(commands.Cog):
                 "reason": reason,
                 "timestamp": ctx.message.created_at.isoformat()
             }
-            ban_collection.insert_one(ban_entry)
+            bans.insert_one(ban_entry)
 
             # Send the success message
             

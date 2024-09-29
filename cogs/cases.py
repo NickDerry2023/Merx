@@ -26,7 +26,7 @@ class CaseSearchCog(commands.Cog):
             return
 
 
-        collections = ['warns', 'blacklists', 'ban_collection']
+        collections = ['warns', 'blacklists', 'bans']
         found_cases = []
 
 
@@ -61,7 +61,7 @@ class CaseSearchCog(commands.Cog):
 
                 # Determine user and moderator field names based on the collection
                 
-                if collection_name == "ban_collection":
+                if collection_name == "bans":
                     
                     
                     user_id = result.get('banned_user_id', 'N/A')
