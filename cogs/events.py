@@ -64,8 +64,9 @@ class MerxEvents(commands.Cog):
         if welcome_channel:
             member_count = member.guild.member_count
             await welcome_channel.send(f"{member.mention} Welcome to **{member.guild.name}**! Feel free to explore. We now have **{member_count}** members. 🎉")         
-
-
+            
+            
+            
     # This handles the permission denied and error embeds. It also generates
     # the UUID for the error embed.
 

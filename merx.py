@@ -84,6 +84,16 @@ async def before_invoke(ctx):
     await global_blacklist_check(ctx)
     
     
+# Logs JSK commands that developers run.
+    
+@merx.add_listener
+async def on_message(message:discord.Message):
+    if not f"{prefix}jsk" in message.content:
+        return
+    if await merx.is_owner(message.author):
+        print(f"Jsk Ran by {message.author.name}({message.author.id}) message: '{message.content}'")
+    
+    
     
 async def global_blacklist_check(ctx):
     
