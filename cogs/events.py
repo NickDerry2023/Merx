@@ -9,9 +9,12 @@ from discord.ext import tasks, commands
 from discord.ext.commands.context import Context
 from cogs.utils.embeds import ErrorEmbed, PermissionDeniedEmbed
 from cogs.utils.errors import send_error_embed
+from cogs.utils.constants import MerxConstants
 
 
 CHANNEL_NAME_FOR_WELCOME = ["chat", "general"]
+constants = MerxConstants()
+prefix =  constants.prefix_setup()
 
 
 class MerxEvents(commands.Cog):
@@ -34,6 +37,19 @@ class MerxEvents(commands.Cog):
         ))
 
         print(f"{self.merx.user.name} is ready with {guild_count} guilds and {user_count:,} users.")
+        
+        
+    
+    @commands.Cog.listener()
+    async def on_message(self, ctx: commands.Context):
+        if ctx.author == self.bot.user:
+            return
+        
+        try:
+            if self.bot.user.mentioned_in(ctx) and len(ctx.content.split(' ')) == 1 and ctx.content[-1] == ">" and ctx.content[0] == '<':
+                return await ctx.channel.send(f"My prefix is `{prefix}`, try to use `{prefix}help` for a list of commands!")
+        except:
+            pass
 
 
 
