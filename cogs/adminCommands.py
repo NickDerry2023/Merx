@@ -155,7 +155,7 @@ class AdminCommandsCog(commands.Cog):
     # guilds accross the platform that uses the bot.
 
 
-    @commands.command()
+    @commands.hybrid_command(name="sync", description="This syncs commands with discord.", with_app_command=True, extras={"category": "Debugging"})
     @commands.has_permissions(administrator=True)
     async def sync(self, ctx: commands.Context):
         
