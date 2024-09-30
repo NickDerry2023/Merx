@@ -42,11 +42,11 @@ class MerxEvents(commands.Cog):
     
     @commands.Cog.listener()
     async def on_message(self, ctx: commands.Context):
-        if ctx.author == self.bot.user:
+        if ctx.author == self.merx.user:
             return
         
         try:
-            if self.bot.user.mentioned_in(ctx) and len(ctx.content.split(' ')) == 1 and ctx.content[-1] == ">" and ctx.content[0] == '<':
+            if self.merx.user.mentioned_in(ctx) and len(ctx.content.split(' ')) == 1 and ctx.content[-1] == ">" and ctx.content[0] == '<':
                 return await ctx.channel.send(f"My prefix is `{prefix}`, try to use `{prefix}help` for a list of commands!")
         except:
             pass
