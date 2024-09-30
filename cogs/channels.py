@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from cogs.utils.embeds import ChannelSuccessEmbed, ErrorEmbed
+from cogs.utils.embeds import ChannelSuccessEmbed, ErrorEmbed, PermissionDeniedEmbed
 from cogs.utils.errors import send_error_embed
 
 class ChannelCommandCog(commands.Cog):

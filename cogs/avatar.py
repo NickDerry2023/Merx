@@ -1,6 +1,8 @@
 import discord
+import shortuuid
 from discord.ext import commands
 from cogs.utils.constants import MerxConstants
+from cogs.utils.errors import send_error_embed
 
 constants = MerxConstants()
 

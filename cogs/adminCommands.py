@@ -3,8 +3,9 @@ import asyncio
 import uuid
 import shortuuid
 from discord.ext import commands
-from cogs.utils.embeds import DebugEmbed, PermissionDeniedEmbed
+from cogs.utils.embeds import DebugEmbed, PermissionDeniedEmbed, CheckGuildEmbed, ErrorEmbed
 from cogs.utils.constants import MerxConstants
+from cogs.utils.errors import send_error_embed
 
 
 constants = MerxConstants()
@@ -46,6 +47,19 @@ class AdminCommandsCog(commands.Cog):
         # Send the embed with debugging information
         
         await ctx.send(embed=DebugEmbed(self.merx, ctx))
+    
+    @commands.hybrid_command(name="check_guild", description="Checks if the bot is in a guild and gets info about it.", with_app_command=True, extras={"category": "Administration"})
+    async def check_guild(self, ctx: commands.Context, id: str):
+        print(id)
+        guild = self.merx.get_guild(id)
+        print(guild)
+
+        if guild == None:
+            await ctx.send(embed=CheckGuildEmbed.create_invalid_guild_embed(id))
+            return 
+        
+        await ctx.send(embed=CheckGuildEmbed.create_valid_guild_embed(self, guild))
+
         
        
         
@@ -155,7 +169,7 @@ class AdminCommandsCog(commands.Cog):
     # guilds accross the platform that uses the bot.
 
 
-    @commands.hybrid_command(name="sync", description="This syncs commands with discord.", with_app_command=True, extras={"category": "Debugging"})
+    @commands.command()
     @commands.has_permissions(administrator=True)
     async def sync(self, ctx: commands.Context):
         
@@ -243,6 +257,7 @@ class AdminCommandsCog(commands.Cog):
             try:
                 user = await self.merx.fetch_user(int(id))
                 result = await collection.delete_one({"discord_id": user.id, "type": "user"})
+                await constants.fetch_blacklisted_users()
                 if result.deleted_count == 0:
                     await self.send_message(ctx, f"<:xmark:1285350796841582612> {user.mention} is not blacklisted.")
                     return
@@ -274,6 +289,7 @@ class AdminCommandsCog(commands.Cog):
         elif entity_type == "guild":
             guild_id = int(id)
             result = await collection.delete_one({"discord_id": guild_id, "type": "guild"})
+            await constants.fetch_blacklisted_guilds()
             
             
             if result.deleted_count == 0:
@@ -369,6 +385,7 @@ class AdminCommandsCog(commands.Cog):
                     return
 
                 await collection.insert_one({"discord_id": user.id, "type": "user", "case_number": case_number})
+                await constants.fetch_blacklisted_users()
                 await self.send_message(ctx, f"<:whitecheck:1285350764595773451> **{case_number} - {user.mention}** has been blacklisted.")
             
             
@@ -396,6 +413,7 @@ class AdminCommandsCog(commands.Cog):
 
 
             await collection.insert_one({"discord_id": guild_id, "type": "guild", "case_number": case_number})
+            await constants.fetch_blacklisted_guilds()
             await self.send_message(ctx, f"<:whitecheck:1285350764595773451> **{case_number} - Guild ID {id}** has been blacklisted.")
 
 

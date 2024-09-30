@@ -1,7 +1,7 @@
 import discord
 import shortuuid
 from discord.ext import commands
-from cogs.utils.embeds import SuccessEmbed, ErrorEmbed, PermissionDeniedEmbed
+from cogs.utils.embeds import SuccessEmbed, ErrorEmbed, PermissionDeniedEmbed, AfkEmbed
 from cogs.utils.constants import MerxConstants
 from cogs.utils.errors import send_error_embed
 
@@ -11,15 +11,29 @@ constants = MerxConstants()
 class AfkCommandCog(commands.Cog):
     def __init__(self, merx):
         self.merx = merx
-        self.afk_users = {}
         
         
 
     @commands.hybrid_command(name="afk", description="Set your AFK status with an optional reason.")
     async def afk(self, ctx, *, reason: str = "No reason provided."):
-
-
-        self.afk_users[ctx.author.id] = reason
+        
+        
+        mongo_db = await constants.mongo_setup()
+        
+        
+        if mongo_db is None:
+            await ctx.send("<:xmark:1285350796841582612> Failed to connect to the database. Please try again later.", ephemeral=True)
+            return  
+        
+        
+        afks_collection = mongo_db["afks"]
+        
+        
+        await afks_collection.update_one(
+            {"user_id": ctx.author.id},
+            {"$set": {"user_id": ctx.author.id, "reason": reason}},
+            upsert=True
+        )
         
         
         await ctx.send(embed=SuccessEmbed(
@@ -37,16 +51,24 @@ class AfkCommandCog(commands.Cog):
             return
 
 
-        if message.author.id in self.afk_users:
-            
-            reason = self.afk_users[message.author.id]
-            
-            error_id = shortuuid.ShortUUID().random(length=8)
-            
-            await message.channel.send(embed=ErrorEmbed(error_id))
+        mongo_db = await constants.mongo_setup()
+        
+        
+        if mongo_db is None:
+            return
+        
+        
+        afks_collection = mongo_db["afks"]
 
 
-            del self.afk_users[message.author.id]
+        if message.mentions:
+            for user in message.mentions:
+                afk_data = await afks_collection.find_one({"user_id": user.id})
+                
+                
+                if afk_data:
+                    await message.channel.send(embed=AfkEmbed(user, afk_data["reason"]))
+
             
             
 
@@ -54,9 +76,23 @@ class AfkCommandCog(commands.Cog):
     async def back(self, ctx):
 
 
-        if ctx.author.id in self.afk_users:
+        mongo_db = await constants.mongo_setup()
+        
+        
+        if mongo_db is None:
+            await ctx.send("<:xmark:1285350796841582612> Failed to connect to the database. Please try again later.", ephemeral=True)
+            return
+        
+        
+        afks_collection = mongo_db["afks"]
+
+        afk_data = await afks_collection.find_one({"user_id": ctx.author.id})
+        
+
+        if afk_data:
             
-            del self.afk_users[ctx.author.id]
+            await afks_collection.delete_one({"user_id": ctx.author.id})
+            
             
             await ctx.send(embed=SuccessEmbed(
                 title="AFK Status Removed",

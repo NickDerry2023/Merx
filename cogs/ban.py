@@ -3,8 +3,9 @@ import asyncio
 import uuid
 import shortuuid
 from discord.ext import commands
-from cogs.utils.embeds import DebugEmbed
+from cogs.utils.embeds import DebugEmbed, PermissionDeniedEmbed
 from cogs.utils.constants import MerxConstants
+from cogs.utils.errors import send_error_embed
 
 
 # This is the admins cog for the bots admin commands that only server admins may run.

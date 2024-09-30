@@ -54,12 +54,13 @@ class Merx(commands.AutoShardedBot):
 # intent. We will call intents later inorder to start Merx Bot.
 
 intents = discord.Intents.default()
+intents.message_content = True
 intents.members = True
 
 
 # Set bot prefix
 
-prefix =  constants.prefix_setup()
+prefix =  constants.prefix_setup
 
 
 # Intializes Merx Bot and loads the prefix, intents, and other important things for discord.
@@ -73,7 +74,6 @@ merx = Merx(command_prefix=prefix,
 
 
 # Before invoking any command, check blacklist.
-
 @merx.before_invoke
 async def before_invoke(ctx):
     # Skip check if the user is in the bypass list
@@ -81,24 +81,21 @@ async def before_invoke(ctx):
         return
     # Run the blacklist check
     await global_blacklist_check(ctx)
-    
-    
-# Logs JSK commands that developers run.
-    
+
 @merx.add_listener
 async def on_message(message:discord.Message):
     if not f"{prefix}jsk" in message.content:
         return
     if await merx.is_owner(message.author):
         print(f"Jsk Ran by {message.author.name}({message.author.id}) message: '{message.content}'")
-    
+
     
     
 async def global_blacklist_check(ctx):
     
 
     # Fetch blacklist if not already fetched or periodically
-    
+
     await constants.fetch_blacklisted_users()
     await constants.fetch_blacklisted_guilds()
 

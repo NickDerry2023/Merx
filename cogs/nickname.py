@@ -5,6 +5,7 @@ import shortuuid
 from discord.ext import commands
 from cogs.utils.embeds import ErrorEmbed, PermissionDeniedEmbed, NicknameSuccessEmbed
 from cogs.utils.constants import MerxConstants
+from cogs.utils.errors import send_error_embed
 
 
 constants = MerxConstants()

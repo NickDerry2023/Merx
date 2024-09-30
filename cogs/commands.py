@@ -84,7 +84,7 @@ class CommandsCog(commands.Cog):
             cluster=cluster,
             environment=environment,
             command_run_time=formatted_time,
-            thumbnail_url="https://cdn.discordapp.com/avatars/1285105545078116453/6554b31a3623d5df531191c3845835d3.png"
+            thumbnail_url="https://cdn.discordapp.com/avatars/1285105979947749406/3a8b148f12e07c1d83c32d4ed26f618e.png"
         )
 
 

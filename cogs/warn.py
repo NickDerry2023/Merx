@@ -4,6 +4,8 @@ import uuid
 import shortuuid
 from discord.ext import commands
 from cogs.utils.constants import MerxConstants
+from cogs.utils.embeds import PermissionDeniedEmbed
+from cogs.utils.errors import send_error_embed
 
 
 constants = MerxConstants()
@@ -13,7 +15,6 @@ class WarnCommandCog(commands.Cog):
     def __init__(self, merx):
         self.merx = merx
         self.constants = MerxConstants()
-
 
 
     @commands.hybrid_command(description="You can run this command to warn a user in your server.", with_app_command=True, extras={"category": "Moderation"})
@@ -44,7 +45,7 @@ class WarnCommandCog(commands.Cog):
         # Check if the bot has permissions to manage messages
         
         if not ctx.guild.me.guild_permissions.manage_messages:
-            await ctx.send("<:xmark:1285350796841582612> I do not have permission to manage messages.", color=discord.Color.red())
+            await ctx.send("<:xmark:1285350796841582612> I do not have permission to manage messages.")
             return
 
 

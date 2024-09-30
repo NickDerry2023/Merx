@@ -508,4 +508,81 @@ class UserInformationEmbed:
             
 
         return embed
+
+class CheckGuildEmbed(discord.Embed):
+    def create_valid_guild_embed(self, guild: discord.Guild):
+        embed = discord.Embed(
+            title="Valid Guild",
+            description="I have found that guild here is the information on it.",
+            color=self.constants.merx_embed_color_setup()
+        )
+        owner = guild.owner
+        member_count = guild.member_count
+        created_at = guild.created_at.strftime("%B %d, %Y")
+        boosts = guild.premium_subscription_count
+        boost_tier = guild.premium_tier
+        icon_url = guild.icon.url if guild.icon else None
+
+        embed.add_field(
+            name="Information",
+            value=f"> **Name:** {guild.name}\n"
+            f"> **Server Owner:** {owner}"
+            f"> **Member Count:** {member_count}"
+            f"> **Created At:** {created_at}"
+            f"> **Boosts:** {boosts}"
+            f"> **Boost Tier:** {boost_tier}"
+        )
+        embed.set_thumbnail(url=icon_url)
+
+        return embed
+    def create_invalid_guild_embed(id):
+        embed = discord.Embed(
+            title="Invalid Guild",
+            description=f"The guild by the id of ({id})",
+            color=discord.Color.red()
+        )
+
+        return embed
     
+    
+# This specifices the afk emebed error, telling use
+    
+class AfkEmbed(discord.Embed):
+    
+    
+    def __init__(self, user: discord.User, reason: str):
+        super().__init__(
+            title=f"{user.name} is currently AFK",
+            description=f"> Reason: {reason}",
+            color=constants.merx_embed_color_setup()
+        )
+        
+        
+        self.set_footer(text="They will respond when they are back.")
+
+
+class EmojiFindEmbed:
+    def __init__(self, emoji):
+        self.emoji = emoji
+        self.constants = constants
+    
+    def create_embed(self):
+        emoji_guild = self.emoji.guild
+        emoji_name = self.emoji.name
+        emoji_animated = self.emoji.animated
+        emoji_created = self.emoji.created_at.timestamp()
+        emoji_id = self.emoji.id
+        emoji_url = self.emoji.url
+
+
+        embed = discord.Embed(
+            title="",
+            description=f"**Name**\n> {emoji_name}\n\n**Id**\n> {emoji_id}\n\n**Animated**\n> {emoji_animated}\n\n**Created**\n> <t:{int(emoji_created)}:f>",
+            color=self.constants.merx_embed_color_setup()
+        )
+
+
+        embed.set_author(name=f"{emoji_guild} emoji.", icon_url=emoji_guild.icon.url)
+        embed.set_thumbnail(url=emoji_url)
+
+        return embed

@@ -26,7 +26,7 @@ class CaseSearchCog(commands.Cog):
             return
 
 
-        collections = ['warns', 'blacklists', 'bans']
+        collections = ['warns', 'blacklists', 'bans', 'kicks']
         found_cases = []
 
 
@@ -86,6 +86,15 @@ class CaseSearchCog(commands.Cog):
                     user_name = result.get('warned_user_name', 'N/A')
                     mod_id = result.get('warned_by_id', 'N/A')
                     mod_name = result.get('warned_by_name', 'N/A')
+                    
+                    
+                elif collection_name == "kicks":
+                    
+                    
+                    user_id = result.get('kicked_user_id', 'N/A')
+                    user_name = result.get('kicked_user_name', 'N/A')
+                    mod_id = result.get('kicked_by_id', 'N/A')
+                    mod_name = result.get('kicked_by_name', 'N/A')
                 
                     
                 else:

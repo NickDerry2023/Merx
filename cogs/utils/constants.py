@@ -78,8 +78,8 @@ class MerxConstants:
 
     # Fetch the customizable prefix for the bot
     
-    def prefix_setup(self):
-        return os.getenv('PREFIX')  # Return default prefix '-' if not set
+    async def prefix_setup(self, bot, message: discord.Message):
+        return await self.fetch_server_prefix(message.guild)
 
 
     # Fetch the bot token
@@ -156,6 +156,18 @@ class MerxConstants:
             
         except Exception as e:
             print(f"Error fetching blacklisted guilds: {str(e)}")
+    
+
+    async def fetch_server_prefix(self, guild):
+        mongo_db = await self.mongo_setup()
+        prefixes_collection = mongo_db['prefixes']
+
+        # Use the async method from the motor driver
+        result = await prefixes_collection.find_one({"guild_id": str(guild.id)})
+        if result and 'prefix' in result:
+            return result['prefix']
+        return os.getenv('PREFIX')
+        
 
 
 
