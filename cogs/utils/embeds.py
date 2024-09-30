@@ -34,7 +34,7 @@ class ErrorEmbed(discord.Embed):
         )
         self.add_field(
             name="",
-            value="If you need assistance, please contact support [here](https://discord.gg/nAX4yhVEgy)."
+            value="If you need assistance, please contact support [here](https://discord.gg/merxbot)."
         )
         
         
@@ -65,7 +65,7 @@ class BlacklistEmbed(discord.Embed):
             description="Your server or account is blacklisted and cannot use Merx.",
             color=discord.Color.red()
         )
-        self.add_field(name="Reason", value="Please contact support [here](https://discord.gg/nAX4yhVEgy for more details.")
+        self.add_field(name="Reason", value="Please contact support [here](https://discord.gg/merxbot for more details.")
         
         
         
@@ -205,7 +205,7 @@ class AboutWithButtons:
         support_server_button = Button(
             label="Support Server", 
             style=discord.ButtonStyle.primary, 
-            url="https://discord.gg/nAX4yhVEgy"
+            url="https://discord.gg/merxbot"
         )
         
         

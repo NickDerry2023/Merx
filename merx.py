@@ -110,7 +110,7 @@ async def global_blacklist_check(ctx):
         
         em = discord.Embed(
             title="Blacklisted",
-            description="This server is blacklisted from Merx - Please appeal within our [Support Server](https://discord.gg/nAX4yhVEgy)!",
+            description="This server is blacklisted from Merx - Please appeal within our [Support Server](https://discord.gg/merxbot)!",
             color=constants.merx_embed_color_setup(),
         )
         
@@ -125,7 +125,7 @@ async def global_blacklist_check(ctx):
         
         em = discord.Embed(
             title="Blacklisted Guild",
-            description="This server is blacklisted from Merx - Please appeal within our [Support Server](https://discord.gg/nAX4yhVEgy)!",
+            description="This server is blacklisted from Merx - Please appeal within our [Support Server](https://discord.gg/merxbot)!",
             color=constants.merx_embed_color_setup(),
         )
         
