@@ -54,7 +54,6 @@ class Merx(commands.AutoShardedBot):
 # intent. We will call intents later inorder to start Merx Bot.
 
 intents = discord.Intents.default()
-intents.message_content = True
 intents.members = True
 
 
