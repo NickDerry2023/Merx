@@ -508,6 +508,8 @@ class UserInformationEmbed:
             
 
         return embed
+    
+    
 
 class CheckGuildEmbed(discord.Embed):
     def create_valid_guild_embed(self, guild: discord.Guild):
@@ -543,6 +545,7 @@ class CheckGuildEmbed(discord.Embed):
         )
 
         return embed
+    
     
     
 # This specifices the afk emebed error, telling use
@@ -586,3 +589,14 @@ class EmojiFindEmbed:
         embed.set_thumbnail(url=emoji_url)
 
         return embed
+    
+    
+    
+# This is the embed for the Auto Moderation feature that gets the list of banned words from
+# Mongo Db then lists it in a nice way.
+
+class AutoModListWordsEmbed(discord.Embed):
+    def __init__(self, guild_name: str, banned_words: str, color: discord.Color):
+        super().__init__(title=f"Banned Words for {guild_name}", color=color)
+        self.add_field(name="Banned Words", value=banned_words, inline=False)
+        self.set_footer(text=f"Total words: {len(banned_words.split(', '))}")

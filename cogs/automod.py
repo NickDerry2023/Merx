@@ -3,7 +3,7 @@ import asyncio
 import time
 from discord.ext import commands
 from collections import defaultdict
-from cogs.utils.embeds import DebugEmbed, PermissionDeniedEmbed, SuccessEmbed
+from cogs.utils.embeds import DebugEmbed, PermissionDeniedEmbed, SuccessEmbed, AutoModListWordsEmbed
 from cogs.utils.constants import MerxConstants
 from cogs.utils.errors import send_error_embed
 
@@ -14,8 +14,8 @@ constants = MerxConstants()
 class AutoModCommandCog(commands.Cog):
     def __init__(self, merx):
         self.merx = merx
-        self.banned_words = []  # This will be fetched from MongoDB
-        self.message_log_channel_id = None  # This will also be fetched from MongoDB
+        self.banned_words = defaultdict(list)
+        self.message_log_channel_id = None
         self.user_message_tracker = defaultdict(list)
 
 
@@ -74,13 +74,17 @@ class AutoModCommandCog(commands.Cog):
 
 
 
+    # This checks for banned words then sends a dm to the user if one is detected. If dms cant be sent to the user then it mentions them
+    # in the guild instead. This prevents the check from erroring out.
+
     async def check_for_banned_words(self, message):
         
         
+        guild_id = message.guild.id
         content = message.content.lower()
         
         
-        for word in self.banned_words:
+        for word in self.banned_words.get(guild_id, []):
             if word in content:
                 await message.delete()
                 try:
@@ -144,9 +148,9 @@ class AutoModCommandCog(commands.Cog):
             
      
     
-    @commands.hybrid_command(name="addword", description="Add a word to the banned words list (Admin only)")
+    @commands.hybrid_command(name="addword", description="Adds a word to the banned words list (Admin only)")
     @commands.has_permissions(administrator=True)  # Check if the user has admin permissions
-    async def add_word(self, ctx: commands.Context, word: str):
+    async def addword(self, ctx: commands.Context, word: str):
     
         
         mongo_db = await constants.mongo_setup()
@@ -156,15 +160,18 @@ class AutoModCommandCog(commands.Cog):
             await ctx.send("<:xmark:1285350796841582612> Failed to connect to the database. Please try again later.", ephemeral=True)
             return
 
+
+        guild_id = ctx.guild.id
+
         
-        await self.add_banned_word(mongo_db, word)
+        await self.add_banned_word(mongo_db, guild_id, word)
         await ctx.send(f"<:whitecheck:1285350764595773451> The word `{word}` has been added to the banned words list.")
 
 
     
-    @commands.hybrid_command(name="removeword", description="Remove a word from the banned words list (Admin only)")
+    @commands.hybrid_command(name="removeword", description="Removes a word from the banned words list (Admin only)")
     @commands.has_permissions(administrator=True)
-    async def remove_word(self, ctx: commands.Context, word: str):
+    async def removeword(self, ctx: commands.Context, word: str):
 
 
         mongo_db = await constants.mongo_setup()
@@ -173,44 +180,86 @@ class AutoModCommandCog(commands.Cog):
         if mongo_db is None:
             await ctx.send("<:xmark:1285350796841582612> Failed to connect to the database. Please try again later.", ephemeral=True)
             return
+        
+        
+        guild_id = ctx.guild.id
 
         
-        await self.remove_banned_word(mongo_db, word)
+        await self.remove_banned_word(mongo_db, guild_id, word)
         await ctx.send(f"<:whitecheck:1285350764595773451> The word `{word}` has been removed from the banned words list.")
 
     
     
-    @commands.hybrid_command(name="listwords", description="Remove a word from the banned words list (Admin only)")
-    async def list_banned_words(self, interaction: discord.Interaction):
+    @commands.hybrid_command(name="listwords", description="Lists the banned words that are not allowed by the guild.")
+    async def listwords(self, ctx: commands.Context):
         
         
-        if not self.banned_words:
-            await interaction.response.send_message("<:xmark:1285350796841582612> No banned words found.", ephemeral=True)
+        guild_id = ctx.guild.id
+        guild_name = ctx.guild.name
+        
+
+        if not self.banned_words.get(guild_id):
+            
+            
+            # Check if it's a slash command interaction or a text command
+            
+            if hasattr(ctx, "interaction") and ctx.interaction is not None:
+                await ctx.interaction.response.send_message("<:xmark:1285350796841582612> No banned words found for this server.", ephemeral=True)
+                
+                
+            else:
+                await ctx.send("<:xmark:1285350796841582612> No banned words found for this server.", ephemeral=True)
             return
 
 
-        banned_words_str = ', '.join(self.banned_words)
-        await interaction.response.send_message(f"<:xmark:1285350796841582612> Banned words: {banned_words_str}", ephemeral=True)
+        banned_words_str = ', '.join(self.banned_words[guild_id])
+        
+
+        embed_color = constants.merx_embed_color_setup()
+
+
+        # Use the AutoModListWordsEmbed with the correct parameters
+        
+        embed = AutoModListWordsEmbed(guild_name=guild_name, banned_words=banned_words_str, color=embed_color)
+
+        # Send response depending on whether it's an interaction or normal context
+        
+        if hasattr(ctx, "interaction") and ctx.interaction is not None:
+            await ctx.interaction.response.send_message(embed=embed, ephemeral=True)
+            
+            
+        else:
+            await ctx.send(embed=embed, ephemeral=True)
         
         
     
     async def fetch_banned_words(self, mongo_db):
+        
+        
         blacklistedwords_collection = mongo_db["blacklistedwords"]
         banned_words_docs = await blacklistedwords_collection.find().to_list(length=100)
-        self.banned_words = [doc['word'] for doc in banned_words_docs if 'word' in doc]
+        
+        
+        # This loops thru the guilds then the words to find which words are banned in
+        # each guild.
+        
+        for doc in banned_words_docs:
+            guild_id = doc.get('guild_id')
+            if guild_id and 'word' in doc:
+                self.banned_words[guild_id].append(doc['word'])
 
 
 
-    async def add_banned_word(self, mongo_db, word):
+    async def add_banned_word(self, mongo_db, guild_id, word):
         blacklistedwords_collection = mongo_db["blacklistedwords"]
-        await blacklistedwords_collection.insert_one({'word': word})
+        await blacklistedwords_collection.insert_one({'guild_id': guild_id, 'word': word})
         await self.fetch_banned_words(mongo_db)
 
 
 
-    async def remove_banned_word(self, mongo_db, word):
+    async def remove_banned_word(self, mongo_db, guild_id, word):
         blacklistedwords_collection = mongo_db["blacklistedwords"]
-        await blacklistedwords_collection.delete_one({'word': word})
+        await blacklistedwords_collection.delete_one({'guild_id': guild_id, 'word': word})
         await self.fetch_banned_words(mongo_db)
 
 
