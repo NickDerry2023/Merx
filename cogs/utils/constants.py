@@ -15,6 +15,7 @@ class MerxConstants:
         self.server_blacklists = []
         
 
+
     # Setup MongoDB connection from environment variables
     
     async def mongo_setup(self):
@@ -45,13 +46,17 @@ class MerxConstants:
         return self.mongo_db
     
     
+    
     # Checks the users to see if they are blacklist bypasssed and bot owner. This function
     # will get the User IDs from MongoDB and can be called to see if users are allowed to
     # run commands.
     
     async def fetch_bypassed_users(self):
+        
+        
         if self.mongo_db is None:
             await self.mongo_setup()
+
 
         try:
             collection = self.mongo_db["blacklist_bypass"]
@@ -62,8 +67,10 @@ class MerxConstants:
 
             self.bypassed_users = bypassed_users
 
+
         except Exception as e:
             print(f"Error fetching bypassed users: {str(e)}")
+    
     
     
     # Checks the owner of the bot
@@ -76,10 +83,12 @@ class MerxConstants:
         return user_id in self.bypassed_users
 
 
+
     # Fetch the customizable prefix for the bot
     
     async def prefix_setup(self, bot, message: discord.Message):
         return await self.fetch_server_prefix(message.guild)
+
 
 
     # Fetch the bot token
@@ -91,10 +100,12 @@ class MerxConstants:
         return token
 
 
+
     # Fetch the Sentry DSN for error reporting
     
     def sentry_dsn_setup(self):
         return os.getenv('SENTRY_DSN')
+
 
 
     # Fetch the default embed color for the bot
@@ -102,6 +113,7 @@ class MerxConstants:
     def merx_embed_color_setup(self):
         DEFAULT_EMBED_COLOR = discord.Color.from_str('#dfa4ff')
         return DEFAULT_EMBED_COLOR
+
 
 
     # Gets the bots type either production or development
@@ -157,15 +169,24 @@ class MerxConstants:
         except Exception as e:
             print(f"Error fetching blacklisted guilds: {str(e)}")
     
+    
 
     async def fetch_server_prefix(self, guild):
+        
+        
         mongo_db = await self.mongo_setup()
         prefixes_collection = mongo_db['prefixes']
 
+
         # Use the async method from the motor driver
+        
         result = await prefixes_collection.find_one({"guild_id": str(guild.id)})
+        
+        
         if result and 'prefix' in result:
             return result['prefix']
+        
+        
         return os.getenv('PREFIX')
         
 

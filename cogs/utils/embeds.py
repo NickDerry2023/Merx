@@ -415,7 +415,7 @@ class SearchResultEmbed(discord.Embed):
 # latency to discors and mongodb.        
         
 class PingCommandEmbed(discord.Embed):
-    def create_ping_embed(latency, websocket_latency, database_latency, uptime, version):
+    def create_ping_embed(latency, database_latency, uptime, version):
         embed = discord.Embed(
             title="",
             color=discord.Color.green()
@@ -425,7 +425,6 @@ class PingCommandEmbed(discord.Embed):
         embed.add_field(
             name="**🏓 Pong!**", 
             value=f"> **Latency:** {round(latency * 1000)}ms\n"
-                  f"> **Websocket Latency:** {websocket_latency}ms\n"
                   f"> **Database Latency:** {database_latency}ms\n"
                   f"> **Uptime:** <t:{int((uptime.timestamp()))}:R>\n"
                   f"> **Build Version:** {version}\n",
@@ -508,8 +507,8 @@ class UserInformationEmbed:
             
 
         return embed
-    
-    
+
+
 
 class CheckGuildEmbed(discord.Embed):
     def create_valid_guild_embed(self, guild: discord.Guild):
@@ -545,7 +544,6 @@ class CheckGuildEmbed(discord.Embed):
         )
 
         return embed
-    
     
     
 # This specifices the afk emebed error, telling use
@@ -591,7 +589,7 @@ class EmojiFindEmbed:
         return embed
     
     
-    
+
 # This is the embed for the Auto Moderation feature that gets the list of banned words from
 # Mongo Db then lists it in a nice way.
 
@@ -600,3 +598,40 @@ class AutoModListWordsEmbed(discord.Embed):
         super().__init__(title=f"Banned Words for {guild_name}", color=color)
         self.add_field(name="Banned Words", value=banned_words, inline=False)
         self.set_footer(text=f"Total words: {len(banned_words.split(', '))}")
+        
+        
+        
+# This is the embed that shows the current prefix for the bot.
+        
+class PrefixEmbed(discord.Embed):
+    def __init__(self, current_prefix: str):
+        super().__init__(
+            title="",
+            description=f"The current prefix for this server is `{current_prefix}`.",
+            color=constants.merx_embed_color_setup()
+        )
+
+
+
+# This is the success embed when the bots prefix is successfully changed by the user.
+
+class PrefixSuccessEmbed(discord.Embed):
+    def __init__(self, new_prefix: str):
+        super().__init__(
+            title="",
+            description=f"<:whitecheck:1285350764595773451> Prefix successfully changed to `{new_prefix}`.",
+            color=discord.Color.green()
+        )
+        
+        
+        
+# This is the reminders success embed that shows when a reminder is successfully set.
+
+class ReminderEmbed(discord.Embed):
+    def __init__(self, reminder_time: str, **kwargs):
+        super().__init__(**kwargs)
+
+        # Set the embed title and color
+        self.title = ""
+        self.description = f"<:whitecheck:1285350764595773451> Got it! I have set a reminder. It will go off at **{reminder_time}**."
+        self.color = discord.Color.green()

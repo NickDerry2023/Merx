@@ -175,13 +175,6 @@ class CommandsCog(commands.Cog):
         
         latency = self.merx.latency
         
-        
-        try:
-            websocket_latency = round(self.merx.ws.latency * 1000)  # In milliseconds
-        except AttributeError:
-            websocket_latency = "Unavailable "  # Fallback to general latency if WebSocket is not initialized
-        
-        
         database_latency = await self.get_mongo_latency()
 
 
@@ -200,7 +193,6 @@ class CommandsCog(commands.Cog):
         
         embed = PingCommandEmbed.create_ping_embed(
             latency=latency,
-            websocket_latency=websocket_latency,
             database_latency=database_latency,
             uptime=self.merx.start_time,
             version=version

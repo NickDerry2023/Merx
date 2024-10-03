@@ -17,6 +17,7 @@ class AutoModCommandCog(commands.Cog):
         self.banned_words = defaultdict(list)
         self.message_log_channel_id = None
         self.user_message_tracker = defaultdict(list)
+        self.blacklist_bypass = set()
 
 
 
@@ -36,6 +37,19 @@ class AutoModCommandCog(commands.Cog):
         
         await self.fetch_banned_words(mongo_db)
         await self.fetch_logging_channel(mongo_db)
+        await self.fetch_blacklist_bypass(mongo_db)
+        
+        
+    
+    # This gets the list of bot owners and developers immune to automod.
+        
+    async def fetch_blacklist_bypass(self, mongo_db):
+
+
+        bypass_collection = mongo_db["blacklist_bypass"]
+        bypass_docs = await bypass_collection.find().to_list(length=100)
+
+        self.blacklist_bypass = {doc['discord_id'] for doc in bypass_docs}
 
 
 
@@ -65,7 +79,7 @@ class AutoModCommandCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.author.bot:
+        if message.author.bot or message.author.id in self.blacklist_bypass:
             return
         
         await self.check_for_banned_words(message)

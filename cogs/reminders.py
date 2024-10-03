@@ -2,7 +2,9 @@ import discord
 import uuid
 from datetime import datetime, timedelta
 from discord.ext import commands, tasks
+from cogs.utils.embeds import ReminderEmbed, PermissionDeniedEmbed, ErrorEmbed
 from cogs.utils.constants import MerxConstants
+from cogs.utils.errors import send_error_embed
 
 
 constants = MerxConstants()
@@ -12,6 +14,7 @@ class ReminderCommandsCog(commands.Cog):
         self.merx = merx
         self.mongo_db = None
         self.check_for_reminders.start()
+
 
     
     @tasks.loop(minutes=1)
@@ -27,7 +30,7 @@ class ReminderCommandsCog(commands.Cog):
 
 
     @commands.hybrid_command(description="This will create a reminder.", with_app_command=True, extras={"category": "General"})
-    async def add_reminder(self, ctx: commands.Context, name:str, time:str, message:str):
+    async def addreminder(self, ctx: commands.Context, name:str, time:str, message:str):
         mongo_db = await constants.mongo_setup()
 
 
@@ -55,9 +58,10 @@ class ReminderCommandsCog(commands.Cog):
         }
 
         mongo_db['reminders'].insert_one(data)
-        print(datetime.now().strftime('%Y-%m-%d %H:%M'))
 
-        await ctx.send(newtime)
+        reminder_embed = ReminderEmbed(reminder_time=newtime)
+
+        await ctx.send(embed=reminder_embed)
         
     
 
@@ -86,10 +90,6 @@ class ReminderCommandsCog(commands.Cog):
                         raise ValueError(f"Invalid number: {number_part}")
 
         raise ValueError(f"Invalid time format: {parameter}")
-
-
-
-
 
 
 

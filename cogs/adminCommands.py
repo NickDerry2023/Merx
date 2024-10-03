@@ -21,7 +21,7 @@ class AdminCommandsCog(commands.Cog):
 
 
 
-    @commands.hybrid_command(name="debug", description="Displays debug information for the Merx.", with_app_command=True, extras={"category": "Debugging"})
+    @commands.command()
     async def debug(self, ctx: commands.Context):
         
         
@@ -31,7 +31,7 @@ class AdminCommandsCog(commands.Cog):
         developer_role = discord.utils.get(ctx.author.roles, id=1285107029093912638)
         
         if not merx_team_role or developer_role:
-            await ctx.send("<:xmark:1285350796841582612> You do not have the required role to use this command.")
+            await ctx.send(embed=PermissionDeniedEmbed())
             return
         
         
@@ -48,15 +48,21 @@ class AdminCommandsCog(commands.Cog):
         
         await ctx.send(embed=DebugEmbed(self.merx, ctx))
     
-    @commands.hybrid_command(name="check_guild", description="Checks if the bot is in a guild and gets info about it.", with_app_command=True, extras={"category": "Administration"})
-    async def check_guild(self, ctx: commands.Context, id: str):
+    
+    
+    @commands.command()
+    async def checkguild(self, ctx: commands.Context, id: str):
+        
+        
         print(id)
         guild = self.merx.get_guild(id)
         print(guild)
+        
 
         if guild == None:
             await ctx.send(embed=CheckGuildEmbed.create_invalid_guild_embed(id))
             return 
+        
         
         await ctx.send(embed=CheckGuildEmbed.create_valid_guild_embed(self, guild))
 
@@ -66,7 +72,7 @@ class AdminCommandsCog(commands.Cog):
     # This command will add users into blacklist_bypass collection so they can run commands like JSK
     # and blacklist_guild or blacklist_user.
         
-    @commands.hybrid_command(name="addowner", description="Add a user to the bypassed list.", with_app_command=True, extras={"category": "Debugging"})
+    @commands.command()
     @commands.has_permissions(administrator=True)
     async def addowner(self, ctx: commands.Context, user: discord.User):
         
@@ -116,7 +122,7 @@ class AdminCommandsCog(commands.Cog):
     # This command will remove owners from the bypassed users and prevent them from using blacklist commands
     # or JSK commands. This is incase the developer or owner leaves or steps down.
     
-    @commands.hybrid_command(name="removeowner", description="Remove a user from the bypassed list.", with_app_command=True, extras={"category": "Debugging"})
+    @commands.command()
     @commands.has_permissions(administrator=True)
     async def removeowner(self, ctx: commands.Context, user: discord.User):
         
@@ -145,6 +151,7 @@ class AdminCommandsCog(commands.Cog):
             await ctx.send(f"<:xmark:1285350796841582612> {user.mention} is not in the bypass list.")
             return
 
+
         try:
             collection = constants.mongo_db["blacklist_bypass"]
             result = await collection.delete_one({"discord_id": user.id})
@@ -159,9 +166,10 @@ class AdminCommandsCog(commands.Cog):
             
             await ctx.send(f"<:whitecheck:1285350764595773451> {user.mention} has been removed from the bypass list.")
             
+            
         except Exception as e:
             error_id = shortuuid.ShortUUID().random(length=8)
-            await send_error_embed(interaction, e, error_id)
+            await send_error_embed(ctx, e, error_id)
     
 
 
@@ -173,9 +181,11 @@ class AdminCommandsCog(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def sync(self, ctx: commands.Context):
         
+        
         if not ctx.author.guild_permissions.administrator:
             await ctx.send(embed=PermissionDeniedEmbed())
             return
+        
         
         synced = await self.merx.tree.sync()
         await ctx.send(f"<:whitecheck:1285350764595773451> Synced {len(synced)} commands. The new commands will be slash commands as well.")
@@ -208,7 +218,7 @@ class AdminCommandsCog(commands.Cog):
     # This is the set of commands to unblacklist a user from the bot. This follows the same set of logic as
     # blacklisting the user but in the opposit order.
 
-    @commands.hybrid_command(name="unblacklist", description="Remove a user or guild from the blacklist.", with_app_command=True, extras={"category": "Administration"})
+    @commands.command()
     async def unblacklist(self, ctx: commands.Context, id: str, entity_type: str, reason: str = "No reason provided."):
         
         
@@ -332,7 +342,7 @@ class AdminCommandsCog(commands.Cog):
     # This set of commands allows server administrators to blacklist the bot and prevent users
     # from runing commands.
 
-    @commands.hybrid_command(name="blacklist", description="Blacklist a user or guild.", with_app_command=True, extras={"category": "Administration"})
+    @commands.command()
     async def blacklist(self, ctx: commands.Context, id: str, entity_type: str):
         
         
