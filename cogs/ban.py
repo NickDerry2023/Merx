@@ -3,9 +3,9 @@ import asyncio
 import uuid
 import shortuuid
 from discord.ext import commands
-from cogs.utils.embeds import DebugEmbed, PermissionDeniedEmbed
+from cogs.utils.embeds import DebugEmbed
 from cogs.utils.constants import MerxConstants
-from cogs.utils.errors import send_error_embed
+ 
 
 
 # This is the admins cog for the bots admin commands that only server admins may run.
@@ -28,14 +28,6 @@ class BanCommandCog(commands.Cog):
             return
         
         bans = mongo_db["bans"]
-        
-        # Bans a member from the server with an optional reason.
-        # Check if the user has administrator permissions
-        
-        
-        if not ctx.author.guild_permissions.administrator:
-            await ctx.send(embed=PermissionDeniedEmbed())
-            return
 
 
         # Check if the bot has permissions to ban members
@@ -81,37 +73,27 @@ class BanCommandCog(commands.Cog):
 
         # Perform the ban operation
         
-        try:
-            await member.ban(reason=reason)
-            
-            # Log to MongoDB
-            
-            ban_entry = {
-                "case_number": case_number,
-                "guild_id": ctx.guild.id,
-                "guild_name": ctx.guild.name,
-                "banned_user_id": member.id,
-                "banned_user_name": str(member),
-                "banned_by_id": ctx.author.id,
-                "banned_by_name": str(ctx.author),
-                "reason": reason,
-                "timestamp": ctx.message.created_at.isoformat()
-            }
-            bans.insert_one(ban_entry)
 
-            # Send the success message
-            
-            await ctx.send(f"<:whitecheck:1285350764595773451> **{case_number} - {member}** has been banned for {reason}.")
+        await member.ban(reason=reason)
         
+        # Log to MongoDB
         
-        except discord.Forbidden:
-            await ctx.send(embed=PermissionDeniedEmbed())
-            return
+        ban_entry = {
+            "case_number": case_number,
+            "guild_id": ctx.guild.id,
+            "guild_name": ctx.guild.name,
+            "banned_user_id": member.id,
+            "banned_user_name": str(member),
+            "banned_by_id": ctx.author.id,
+            "banned_by_name": str(ctx.author),
+            "reason": reason,
+            "timestamp": ctx.message.created_at.isoformat()
+        }
+        bans.insert_one(ban_entry)
+
+        # Send the success message
         
-        
-        except discord.HTTPException:
-            error_id = shortuuid.ShortUUID().random(length=8)
-            await send_error_embed(interaction, e, error_id)
+        await ctx.send(f"<:whitecheck:1285350764595773451> **{case_number} - {member}** has been banned for {reason}.")
             
             
             
@@ -163,38 +145,12 @@ class BanCommandCog(commands.Cog):
     @commands.bot_has_permissions(ban_members=True)
     async def softban(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
         
-        
-        try:
 
-            await ctx.guild.ban(member, reason=reason, delete_message_days=1)
-            case_number = f"Case #{str(uuid.uuid4().int)[:4]}"  # Generate a short unique case number
-            await ctx.send(f"<:whitecheck:1285350764595773451> **{case_number} - Successfully softbanned {member.mention}** for: {reason}")
-            await asyncio.sleep(2)
-            await ctx.guild.unban(member)
-
-
-        except discord.Forbidden:
-            await ctx.send("<:xmark:1285350796841582612> I do not have permission to ban this user.")
-        except discord.HTTPException as e:
-            error_id = shortuuid.ShortUUID().random(length=8)
-            await send_error_embed(ctx, e, error_id)
-
-
-
-    @softban.error
-    async def softban_error(self, ctx, error):
-        
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.send("<:xmark:1285350796841582612> You do not have the required permissions to softban members.")
-            
-            
-        elif isinstance(error, commands.BotMissingPermissions):
-            await ctx.send("<:xmark:1285350796841582612> I do not have the required permissions to softban members.")
-            
-            
-        else:
-            error_id = shortuuid.ShortUUID().random(length=8)
-            await send_error_embed(ctx, error, error_id)
+        await ctx.guild.ban(member, reason=reason, delete_message_days=1)
+        case_number = f"Case #{str(uuid.uuid4().int)[:4]}"  # Generate a short unique case number
+        await ctx.send(f"<:whitecheck:1285350764595773451> **{case_number} - Successfully softbanned {member.mention}** for: {reason}")
+        await asyncio.sleep(2)
+        await ctx.guild.unban(member)
         
         
         

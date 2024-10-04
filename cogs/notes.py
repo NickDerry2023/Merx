@@ -2,13 +2,14 @@ import discord
 import uuid
 from discord.ext import commands
 from cogs.utils.constants import MerxConstants
-from cogs.utils.embeds import PermissionDeniedEmbed
 
 constants = MerxConstants()
 
 class NoteCommandsCog(commands.Cog):
     def __init__(self, merx):
         self.merx = merx
+    
+    
     
     @commands.hybrid_command(descriptions="Adds a moderator note to a user.", with_app_command=True, extras={"category": "Moderation"})
     async def add_note(self, ctx: commands.Context, member: discord.Member, reason):
@@ -22,9 +23,6 @@ class NoteCommandsCog(commands.Cog):
         
         notes_collection = mongo_db['notes']
 
-        if not ctx.author.guild_permissions.administrator:
-            await ctx.send(embed=PermissionDeniedEmbed())
-            return
         
         note_id = f"Note #{str(uuid.uuid4().int)[:4]}"
 
@@ -44,6 +42,8 @@ class NoteCommandsCog(commands.Cog):
 
         await ctx.send(f"<:warning:1285350764595773451> **{note_id}** has been logged for {member}.")
 
+
+
     @commands.hybrid_command(descriptions="Delete a note on a user", with_app_command=True, extras={"category": "Moderation"})
     async def remove_note(self, ctx: commands.Context, id):
         mongo_db = await constants.mongo_setup()
@@ -57,15 +57,10 @@ class NoteCommandsCog(commands.Cog):
         
         notes_collection = mongo_db['notes']
 
-
-        if not ctx.author.guild_permissions.administrator:
-            await ctx.send(embed=PermissionDeniedEmbed())
-            return
-        
-
         notes_collection.delete_one({"note_id": f"Note #{id}"})
 
         await ctx.send(f"<:warning:1285350764595773451> **Note #{id}** has been removed.")
+
 
 
     @commands.hybrid_command(descriptions="Search for a note on a user", with_app_command=True, extras={"category": "Moderation"})
@@ -81,10 +76,6 @@ class NoteCommandsCog(commands.Cog):
         
         notes_collection = mongo_db['notes']
 
-
-        if not ctx.author.guild_permissions.administrator:
-            await ctx.send(embed=PermissionDeniedEmbed())
-            return
         
         result = await notes_collection.find_one({"note_id": f"Note #{id}"})
 
@@ -108,6 +99,7 @@ class NoteCommandsCog(commands.Cog):
             await ctx.send(embed=embed)
         else:
             await ctx.send(f"<:xmark:1285350796841582612> No note found with the ID {id}.")
+
 
 
 async def setup(merx):

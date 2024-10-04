@@ -3,9 +3,9 @@ import asyncio
 import time
 from discord.ext import commands
 from collections import defaultdict
-from cogs.utils.embeds import DebugEmbed, PermissionDeniedEmbed, SuccessEmbed, AutoModListWordsEmbed
+from cogs.utils.embeds import DebugEmbed, SuccessEmbed, AutoModListWordsEmbed
 from cogs.utils.constants import MerxConstants
-from cogs.utils.errors import send_error_embed
+ 
 
 
 constants = MerxConstants()

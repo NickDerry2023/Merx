@@ -1,11 +1,12 @@
 import discord
 from discord.ext import commands
-from cogs.utils.embeds import ChannelSuccessEmbed, ErrorEmbed, PermissionDeniedEmbed
-from cogs.utils.errors import send_error_embed
+from cogs.utils.embeds import ChannelSuccessEmbed
+ 
 
 class ChannelCommandCog(commands.Cog):
     def __init__(self, merx):
         self.merx = merx
+        self.locked_channels = {} 
 
 
     # This allows the creation of a catagory.
@@ -38,17 +39,32 @@ class ChannelCommandCog(commands.Cog):
                 
         else:
             await ctx.send("<:xmark:1285350796841582612> Please specify either 'category' or 'channel' as the type.")
+            
+    
+    '''
+            
+    @commands.hybrid_command(name="lock", description="Locks the current channel.", with_app_command=True, extras={"category": "Moderation"})
+    async def lock(self, ctx):
+        role = ctx.guild.default_role
+        channel = ctx.channel
+        await channel.set_permissions(role, send_messages=False)
+        await ctx.send(f"🔒 {channel.mention} has been locked.")
 
 
 
-    @commands.hybrid_command(description="Delete a channel or category.", with_app_command=True, extras={"category": "Administration"})
-    @commands.has_permissions(administrator=True)
-    async def delete(self, ctx, target: discord.abc.GuildChannel):
-        
-        
-        await target.delete()
-        embed = ChannelSuccessEmbed(title="Deleted Target", description=f"<:whitecheck:1285350764595773451> {target.name} has been deleted successfully.")
-        await ctx.send(embed=embed)
+    @commands.hybrid_command(name="unlock", description="Unlocks the current channel and restores original permissions.", with_app_command=True, extras={"category": "Moderation"})
+    async def unlock(self, ctx):
+        role = ctx.guild.default_role
+        channel = ctx.channel
+        if channel.id in self.locked_channels:
+            original_permission = self.locked_channels.pop(channel.id)
+            await channel.set_permissions(role, send_messages=original_permission)
+            await ctx.send(f"🔓 {channel.mention} has been unlocked and permissions restored.")
+        else:
+            await ctx.send(f"Channel {channel.mention} is not locked.")
+            
+    '''
+
 
 
 

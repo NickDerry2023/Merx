@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from cogs.utils.constants import MerxConstants
-from cogs.utils.embeds import PermissionDeniedEmbed, PrefixEmbed, PrefixSuccessEmbed
+from cogs.utils.embeds import PrefixEmbed, PrefixSuccessEmbed
 
 constants = MerxConstants()
 

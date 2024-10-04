@@ -2,8 +2,8 @@ import discord
 from datetime import datetime
 from discord.ext import commands
 from cogs.utils.constants import MerxConstants
-from cogs.utils.embeds import SearchResultEmbed, ErrorEmbed
-from cogs.utils.errors import send_error_embed
+from cogs.utils.embeds import SearchResultEmbed
+ 
 
 constants = MerxConstants()
 

@@ -2,7 +2,6 @@ import discord
 import uuid
 from discord.ext import commands
 from cogs.utils.constants import MerxConstants
-from cogs.utils.embeds import PermissionDeniedEmbed
 
 constants = MerxConstants()
 
@@ -26,11 +25,6 @@ class KickCommandCog(commands.Cog):
         
         
         kick_collection = mongo_db["kicks"]
-        
-
-        if not ctx.author.guild_permissions.kick_members:
-            await ctx.send(embed=PermissionDeniedEmbed())
-            return
         
         
         if not ctx.guild.me.guild_permissions.manage_messages:

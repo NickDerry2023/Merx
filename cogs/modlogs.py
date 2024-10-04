@@ -4,8 +4,8 @@ import uuid
 import shortuuid
 from discord.ext import commands
 from cogs.utils.constants import MerxConstants
-from cogs.utils.embeds import ErrorEmbed, PermissionDeniedEmbed, UserInformationEmbed, SuccessEmbed
-from cogs.utils.errors import send_error_embed
+from cogs.utils.embeds import UserInformationEmbed, SuccessEmbed
+ 
 
 
 constants = MerxConstants()
@@ -121,23 +121,6 @@ class ModLogsCommandCog(commands.Cog):
             return
         
         
-        logs, error = await self.getModLogsLogic(member_from.id)
-        if error:
-            await ctx.send(embed=ErrorEmbed(description=error))
-            return
-
-
-        if not logs or (not logs['warnings'] and not logs['bans'] and not logs['blacklists']):
-            await ctx.send(embed=ErrorEmbed(description=f"No mod logs found for {member_from.display_name}."))
-            return
-
-
-        error = await self.transferUpdateModLogsLogic(member_to.id, logs)
-        if error:
-            await ctx.send(embed=ErrorEmbed(description=error))
-            return
-        
-        
         await self.delete_modlogs(member_from.id)
 
         await ctx.send(embed=SuccessEmbed(description=f"Mod logs have been transferred from {member_from.display_name} to {member_to.display_name}."))
@@ -152,24 +135,6 @@ class ModLogsCommandCog(commands.Cog):
         
         if not member:
             await ctx.send(embed=ErrorEmbed(description="You must specify a member to clear mod logs for."))
-            return
-
-
-        logs, error = await self.getModLogsLogic(member.id)
-        if error:
-            await ctx.send(embed=ErrorEmbed(description=error))
-            return
-        
-
-        if not logs or (not logs['warnings'] and not logs['bans'] and not logs['blacklists']):
-            await ctx.send(embed=ErrorEmbed(description=f"No mod logs found for {member.display_name}."))
-            return
-
-
-
-        error = await self.deleteModLogsLogic(member.id)
-        if error:
-            await ctx.send(embed=ErrorEmbed(description=error))
             return
 
 

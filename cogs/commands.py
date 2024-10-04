@@ -11,7 +11,7 @@ from discord.ext import commands
 from discord.ui import View, Button
 from cogs.utils.constants import MerxConstants
 from cogs.utils.embeds import AboutEmbed, AboutWithButtons, PingCommandEmbed, ServerInformationEmbed
-from cogs.utils.errors import send_error_embed
+ 
 
 
 constants = MerxConstants()
@@ -102,23 +102,16 @@ class CommandsCog(commands.Cog):
     @commands.hybrid_command(description="Displays information about the current server.", with_app_command=True, extras={"category": "General"})
     async def serverinfo(self, ctx):
 
-        try:
 
-            embed = ServerInformationEmbed(ctx.guild, constants).create_embed()
+        embed = ServerInformationEmbed(ctx.guild, constants).create_embed()
 
-            if isinstance(ctx, Interaction):
-                
-                await ctx.response.send_message(embed=embed)
-                
-            elif isinstance(ctx, commands.Context):
-                
-                await ctx.send(embed=embed)
+        if isinstance(ctx, Interaction):
             
+            await ctx.response.send_message(embed=embed)
             
-        except Exception as e:
-            error_id = shortuuid.ShortUUID().random(length=8)
-            print(f"Exception occurred: {e}")
-            await send_error_embed(ctx, e, error_id)
+        elif isinstance(ctx, commands.Context):
+            
+            await ctx.send(embed=embed)
             
             
             

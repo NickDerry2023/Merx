@@ -20,39 +20,85 @@ class SuccessEmbed(discord.Embed):
             color=discord.Color.green(), 
             **kwargs
         )
+        
+        
+        
+# This is the missing aguments embed, we create this embed when someone forgets a command parameter for example member or option.
+# This makes it easier for users to correct their error in the command.
+        
+class MissingArgsEmbed(discord.Embed):
+    def __init__(self, param_name):
+        super().__init__(
+            title="",
+            description=f"<:xmark:1285350796841582612> You are missing the `{param_name}` argument.",
+            color=discord.Color.red()
+        )
+        
+        
+
+# This is the bad aguments embed, we create this embed when someone gives a bad command parameter for example member or option.
+# This makes it easier for users to correct their error in the command.
+
+class BadArgumentEmbed(discord.Embed):
+    def __init__(self):
+        super().__init__(
+            title="",
+            description="<:xmark:1285350796841582612> You provided an incorrect argument type.",
+            color=discord.Color.red()
+        )
+
+
+
+# This is the forbidden error embed for when users perform forbidden actions using the bot and Discord API.
+
+class ForbiddenEmbed(discord.Embed):
+    def __init__(self):
+        super().__init__(
+            title="",
+            description="<:xmark:1285350796841582612> I couldn't send you a DM. Please check your DM settings.",
+            color=discord.Color.red()
+        )
+
+
+
+# This is the permission denied embed, this will be used for things like admin commands or places where certain roles
+# can only run the command, if they dont meet those requirements this will be sent instead.
+
+class MissingPermissionsEmbed(discord.Embed):
+    def __init__(self):
+        super().__init__(
+            title="",
+            description="<:xmark:1285350796841582612> You don't have the required permissions to run this command.",
+            color=discord.Color.red()
+        )
 
 
 
 # This is the error embed, call the errors.py file as well as this file and class to pass an error
 
-class ErrorEmbed(discord.Embed):
-    def __init__(self, error: Exception, error_id: str):
+class UserErrorEmbed(discord.Embed):
+    def __init__(self, error_id):
         super().__init__(
-            title="Error Occurred",
-            description=f"**Error ID:** `{error_id}`\n\n**Error Message:** {str(error)}\n\n",
+            title="Something Went Wrong",
+            description=f"Please contact [Merx Support](https://discord.gg/merxbot)!\nError ID: `{error_id}`",
             color=discord.Color.red()
         )
-        self.add_field(
-            name="",
-            value="If you need assistance, please contact support [here](https://discord.gg/merxbot)."
-        )
-        
-        
-        
-# This is the permission denied embed, this will be used for things like admin commands or places where certain roles
-# can only run the command, if they dont meet those requirements this will be sent instead.
 
-class PermissionDeniedEmbed(discord.Embed):
-    def __init__(self):
+
+
+# Developer error embed.
+
+class DeveloperErrorEmbed(discord.Embed):
+    def __init__(self, error, ctx, error_id):
         super().__init__(
-            title="Permission Denied",
-            description="**Error Message** You do not have the required permissions to use this command.",
+            title="Something went wrong!",
+            description=f'{error}',
             color=discord.Color.red()
         )
-        self.add_field(
-            name="", 
-            value="Please contact an admin if you believe this is an error."
-        )
+        self.add_field(name='Error ID', value=f'__{error_id}__', inline=True)
+        self.add_field(name='User', value=f'{ctx.author.mention}(**{ctx.author.id}**)', inline=True)
+        self.add_field(name='Server Info', value=f'{ctx.guild.name}(**{ctx.guild.id}**)', inline=True)
+        self.add_field(name='Command', value=f"Name: {ctx.command.qualified_name}\nArgs: {ctx.command.params}", inline=True)
         
 
 

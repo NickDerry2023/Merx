@@ -3,9 +3,9 @@ import asyncio
 import uuid
 import shortuuid
 from discord.ext import commands
-from cogs.utils.embeds import DebugEmbed, PermissionDeniedEmbed, CheckGuildEmbed, ErrorEmbed
+from cogs.utils.embeds import DebugEmbed, CheckGuildEmbed
 from cogs.utils.constants import MerxConstants
-from cogs.utils.errors import send_error_embed
+ 
 
 
 constants = MerxConstants()
@@ -29,19 +29,6 @@ class AdminCommandsCog(commands.Cog):
         
         merx_team_role = discord.utils.get(ctx.author.roles, id=1285107029093912637)
         developer_role = discord.utils.get(ctx.author.roles, id=1285107029093912638)
-        
-        if not merx_team_role or developer_role:
-            await ctx.send(embed=PermissionDeniedEmbed())
-            return
-        
-        
-        # Displays debugging information.
-        # Check if the user has administrator permissions
-        
-        
-        if not ctx.author.guild_permissions.administrator:
-            await ctx.send(embed=PermissionDeniedEmbed())
-            return
 
 
         # Send the embed with debugging information
@@ -100,22 +87,16 @@ class AdminCommandsCog(commands.Cog):
             return
 
 
-        try:
-            # Add the user to the MongoDB collection
-            
-            collection = constants.mongo_db["blacklist_bypass"]
-            await collection.insert_one({"discord_id": user.id})
-            
-            
-            # Fetch updated bypassed users list
-            
-            await constants.fetch_bypassed_users()
-            await ctx.send(f"<:whitecheck:1285350764595773451> {user.mention} has been added to the bypass list. They can now run owner commands.")
-            
-            
-        except Exception as e:
-            embed = ErrorEmbed()
-            await ctx.send(embed=embed)
+        # Add the user to the MongoDB collection
+        
+        collection = constants.mongo_db["blacklist_bypass"]
+        await collection.insert_one({"discord_id": user.id})
+        
+        
+        # Fetch updated bypassed users list
+        
+        await constants.fetch_bypassed_users()
+        await ctx.send(f"<:whitecheck:1285350764595773451> {user.mention} has been added to the bypass list. They can now run owner commands.")
 
 
 
@@ -152,25 +133,19 @@ class AdminCommandsCog(commands.Cog):
             return
 
 
-        try:
-            collection = constants.mongo_db["blacklist_bypass"]
-            result = await collection.delete_one({"discord_id": user.id})
-            
-            if result.deleted_count == 0:
-                await ctx.send(f"<:xmark:1285350796841582612> {user.mention} could not be removed from the bypass list.")
-                return
+        collection = constants.mongo_db["blacklist_bypass"]
+        result = await collection.delete_one({"discord_id": user.id})
+        
+        if result.deleted_count == 0:
+            await ctx.send(f"<:xmark:1285350796841582612> {user.mention} could not be removed from the bypass list.")
+            return
 
-            # Fetch the updated bypassed users list after removal
+        # Fetch the updated bypassed users list after removal
+        
+        await constants.fetch_bypassed_users()
+        
+        await ctx.send(f"<:whitecheck:1285350764595773451> {user.mention} has been removed from the bypass list.")
             
-            await constants.fetch_bypassed_users()
-            
-            await ctx.send(f"<:whitecheck:1285350764595773451> {user.mention} has been removed from the bypass list.")
-            
-            
-        except Exception as e:
-            error_id = shortuuid.ShortUUID().random(length=8)
-            await send_error_embed(ctx, e, error_id)
-    
 
 
     # This is a custom sync command cause JSK sync is broken, this will sync the commands with Discord
@@ -182,28 +157,10 @@ class AdminCommandsCog(commands.Cog):
     async def sync(self, ctx: commands.Context):
         
         
-        if not ctx.author.guild_permissions.administrator:
-            await ctx.send(embed=PermissionDeniedEmbed())
-            return
-        
-        
         synced = await self.merx.tree.sync()
         await ctx.send(f"<:whitecheck:1285350764595773451> Synced {len(synced)} commands. The new commands will be slash commands as well.")
 
 
-
-    @addowner.error
-    async def add_owner_error(self, ctx: commands.Context, error):
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.send(embed=PermissionDeniedEmbed())
-            
-            
-            
-    @removeowner.error
-    async def remove_owner_error(self, ctx: commands.Context, error):
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.send(embed=PermissionDeniedEmbed())
-        
         
     # Checks if the user is in the blacklist bypass also known as
     # bot owners collection so that only we can blacklist users.
@@ -325,18 +282,6 @@ class AdminCommandsCog(commands.Cog):
         else:
             await ctx.send(content=content, embed=embed)
 
-
-
-    # Error handling for unblacklist command
-    
-    @unblacklist.error
-    async def unblacklist_error(self, ctx: commands.Context, error):
-        if isinstance(error, commands.MissingPermissions):
-            await self.send_message(ctx, embed=PermissionDeniedEmbed())
-        else:
-            error_id = shortuuid.ShortUUID().random(length=8)
-            await send_error_embed(ctx, error, error_id)
-
         
         
     # This set of commands allows server administrators to blacklist the bot and prevent users
@@ -366,11 +311,6 @@ class AdminCommandsCog(commands.Cog):
         # the righr parmeter.
         
         bypassed = await self.is_bypassed_user(ctx.author.id)
-        
-        
-        if not bypassed:
-            await self.send_message(ctx, embed=PermissionDeniedEmbed())
-            return
 
         
         if entity_type not in ["user", "guild"]:
@@ -446,20 +386,6 @@ class AdminCommandsCog(commands.Cog):
                 
         else:
             await ctx.send(content=content, embed=embed)
-
-
-
-    # This is the error handling for the blacklist logic incase something goes wrong, like
-    # incorrect permissions.
-    
-    @blacklist.error
-    async def blacklist_error(self, ctx: commands.Context, error):
-        if isinstance(error, commands.MissingPermissions):
-            await self.send_message(ctx, embed=PermissionDeniedEmbed())
-        else:
-            error_id = shortuuid.ShortUUID().random(length=8)
-            await send_error_embed(ctx, error, error_id)   
-    
         
         
 

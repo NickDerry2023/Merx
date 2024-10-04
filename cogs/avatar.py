@@ -2,7 +2,7 @@ import discord
 import shortuuid
 from discord.ext import commands
 from cogs.utils.constants import MerxConstants
-from cogs.utils.errors import send_error_embed
+ 
 
 constants = MerxConstants()
 
@@ -16,30 +16,25 @@ class AvatarCommandCog(commands.Cog):
 
     @commands.hybrid_command(name="av", description="Displays the avatar of a user. If no user is mentioned, shows your avatar.", with_app_command=True, extras={"category": "General"})
     async def av(self, ctx, user: discord.User = None):
-        try:
+
             
-            if user is None:
-                user = ctx.author
-            
-            
-            embed = discord.Embed(
-                title=f"{user}'s Avatar",
-                color=constants.merx_embed_color_setup()
-            )
-            
-            
-            # Send the actual embed with a footer.
-            
-            embed.set_image(url=user.avatar.url)
-            embed.set_footer(text=f"Requested by {ctx.author}")
+        if user is None:
+            user = ctx.author
+        
+        
+        embed = discord.Embed(
+            title=f"{user}'s Avatar",
+            color=constants.merx_embed_color_setup()
+        )
+        
+        
+        # Send the actual embed with a footer.
+        
+        embed.set_image(url=user.avatar.url)
+        embed.set_footer(text=f"Requested by {ctx.author}")
 
 
-            await ctx.send(embed=embed)
-
-
-        except Exception as e:
-            error_id = shortuuid.ShortUUID().random(length=8)
-            await send_error_embed(ctx, e, error_id)
+        await ctx.send(embed=embed)
 
 
 

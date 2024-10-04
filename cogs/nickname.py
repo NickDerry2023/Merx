@@ -3,9 +3,9 @@ import asyncio
 import uuid
 import shortuuid
 from discord.ext import commands
-from cogs.utils.embeds import ErrorEmbed, PermissionDeniedEmbed, NicknameSuccessEmbed
+from cogs.utils.embeds import NicknameSuccessEmbed
 from cogs.utils.constants import MerxConstants
-from cogs.utils.errors import send_error_embed
+ 
 
 
 constants = MerxConstants()
@@ -28,21 +28,15 @@ class NickCommandCog(commands.Cog):
         previous_nickname = member.display_name
 
 
-        try:
-            
-            await member.edit(nick=nickname if nickname else None)
+        await member.edit(nick=nickname if nickname else None)
 
-            embed = NicknameSuccessEmbed(
-                user=member,
-                previous_name=previous_nickname,
-                new_name=nickname if nickname else "Cleared"
-            )
-            
-            await ctx.send(embed=embed)
-            
-            
-        except discord.Forbidden:
-            await ctx.send("<:xmark:1285350796841582612> I do not have permissions to nickname this user.", ephemeral=False)
+        embed = NicknameSuccessEmbed(
+            user=member,
+            previous_name=previous_nickname,
+            new_name=nickname if nickname else "Cleared"
+        )
+        
+        await ctx.send(embed=embed)
 
 
 
