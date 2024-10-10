@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-from cogs.utils.constants import MerxConstants
-from cogs.utils.embeds import EmojiFindEmbed
+from utils.constants import MerxConstants
+from utils.embeds import EmojiFindEmbed
 
 constants = MerxConstants()
 

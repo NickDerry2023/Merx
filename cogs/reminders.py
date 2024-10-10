@@ -2,8 +2,8 @@ import discord
 import uuid
 from datetime import datetime, timedelta
 from discord.ext import commands, tasks
-from cogs.utils.embeds import ReminderEmbed
-from cogs.utils.constants import MerxConstants
+from utils.embeds import ReminderEmbed
+from utils.constants import MerxConstants, reminders
  
 
 
@@ -19,26 +19,17 @@ class ReminderCommandsCog(commands.Cog):
     
     @tasks.loop(minutes=1)
     async def check_for_reminders(self):
-        mongo_db = await constants.mongo_setup()
-        async for reminder in mongo_db['reminders'].find({}):
+        async for reminder in reminders.find({}):
             if reminder["time"] == datetime.now().strftime('%Y-%m-%d %H:%M'):
                 print("Reminder went off.")
                 await self.merx.get_user(reminder["user_id"]).send("Your reminder went off :)")
-                mongo_db['reminders'].delete_one(reminder)
+                reminders.delete_one(reminder)
         
 
 
 
     @commands.hybrid_command(description="This will create a reminder.", with_app_command=True, extras={"category": "General"})
     async def addreminder(self, ctx: commands.Context, name:str, time:str, message:str):
-        mongo_db = await constants.mongo_setup()
-
-
-        if mongo_db is None:
-            
-            await ctx.send("<:xmark:1285350796841582612> Failed to connect to the database. Please try again later.", ephemeral=True)
-            return
-        
         try:
             newtime = self.time_converter(datetime.now().strftime('%Y-%m-%d %H:%M'),time)
         except ValueError:
@@ -57,7 +48,7 @@ class ReminderCommandsCog(commands.Cog):
             "time": newtime
         }
 
-        mongo_db['reminders'].insert_one(data)
+        reminders.insert_one(data)
 
         reminder_embed = ReminderEmbed(reminder_time=newtime)
 

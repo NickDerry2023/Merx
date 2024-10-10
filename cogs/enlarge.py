@@ -1,7 +1,7 @@
 import discord
 from discord import Embed
 from discord.ext import commands
-from cogs.utils.constants import MerxConstants
+from utils.constants import MerxConstants
 
 
 constants = MerxConstants()

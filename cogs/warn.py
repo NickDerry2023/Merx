@@ -1,71 +1,39 @@
 import discord
-import asyncio
 import uuid
-import shortuuid
 from discord.ext import commands
-from cogs.utils.constants import MerxConstants
- 
-
-
-constants = MerxConstants()
-
+from utils.constants import cases
+from utils.utils import get_next_case_id
+import time
 
 class WarnCommandCog(commands.Cog):
     def __init__(self, merx):
         self.merx = merx
-        self.constants = MerxConstants()
 
 
     @commands.hybrid_command(description="You can run this command to warn a user in your server.", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_permissions(administrator=True)
     async def warn(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
-        mongo_db = await self.constants.mongo_setup()
+        case_id = await get_next_case_id(ctx.guild.id)
 
-
-        if mongo_db is None:
-            
-            await ctx.send("<:xmark:1285350796841582612> Failed to connect to the database. Please try again later.", ephemeral=True)
-            return
-        
-        
-        
-        warn_collection = mongo_db["warns"]
-        
-        
-
-        # Generate a unique case number
-        
-        case_number = f"Case #{str(uuid.uuid4().int)[:4]}"
-
-
-
-        # Sends a DM to the user
-        
         try:
-            dm_message = f"<:warning:1285350764595773451> **{case_number} - You have been warned in {ctx.guild.name}** for {reason}."
+            dm_message = f"<:warning:1285350764595773451> **Case #{case_id} - You have been warned in {ctx.guild.name}** for {reason}."
             await member.send(dm_message)
         except discord.Forbidden:
             await ctx.send(f"<:xmark:1285350796841582612> Unable to send a DM to {member.mention}; warning the user in the server.")
-
-
-
-        # Log to MongoDB, This will put the warning into the database.
         
         warn_entry = {
-            "case_number": case_number,
+            "case_id": case_id,
             "guild_id": ctx.guild.id,
-            "guild_name": ctx.guild.name,
-            "warned_user_id": member.id,
-            "warned_user_name": str(member),
-            "warned_by_id": ctx.author.id,
-            "warned_by_name": str(ctx.author),
+            "user_id": member.id,
+            "moderator_id": ctx.author.id,
             "reason": reason,
-            "timestamp": ctx.message.created_at.isoformat()
+            "timestamp": int(time.time()),
+            "type": "warn",
+            "status": "active"
         }
-        warn_collection.insert_one(warn_entry)
+        await cases.insert_one(warn_entry)
 
-
-        await ctx.send(f"<:warning:1285350764595773451> **{case_number} - {member}** has been warned for {reason}.")
+        await ctx.send(f"<:warning:1285350764595773451> **Case #{case_id} - {member}** has been warned for {reason}.")
 
 
 

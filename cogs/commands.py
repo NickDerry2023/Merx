@@ -1,17 +1,12 @@
 import discord
-import platform
-import uuid
-import shortuuid
 import time
 import datetime
 import subprocess
 from datetime import datetime
 from discord import Interaction
 from discord.ext import commands
-from discord.ui import View, Button
-from cogs.utils.constants import MerxConstants
-from cogs.utils.embeds import AboutEmbed, AboutWithButtons, PingCommandEmbed, ServerInformationEmbed
- 
+from utils.constants import MerxConstants, db
+from utils.embeds import AboutEmbed, AboutWithButtons, PingCommandEmbed, ServerInformationEmbed
 
 
 constants = MerxConstants()
@@ -40,16 +35,6 @@ class CommandsCog(commands.Cog):
         except discord.NotFound:
             pass
         
-        
-        
-        mongo_db = await constants.mongo_setup()
-
-        if mongo_db is None:
-            await ctx.send("<:xmark:1285350796841582612> Failed to connect to the database. Please try again later.", ephemeral=True)
-            return
-        
-        
-        
         # Collect information for the embed such as the bots uptime, hosting information, database information
         # user information and server information so that users can see the growth of the bot.
         
@@ -57,7 +42,7 @@ class CommandsCog(commands.Cog):
         uptime_formatted = f"<t:{int((self.merx.start_time.timestamp()))}:R>"
         guilds = len(self.merx.guilds)
         users = sum(guild.member_count for guild in self.merx.guilds)
-        version_info = await mongo_db.command('buildInfo')
+        version_info = await db.command('buildInfo')
         version = version_info.get('version', 'Unknown')
         shards = self.merx.shard_count or 1
         cluster = 0
@@ -84,7 +69,7 @@ class CommandsCog(commands.Cog):
             cluster=cluster,
             environment=environment,
             command_run_time=formatted_time,
-            thumbnail_url="https://cdn.discordapp.com/avatars/1285105545078116453/189281ca322c3cdfa71fee8a50e796d6.png?size=1024"
+            thumbnail_url="https://cdn.discordapp.com/avatars/1285105979947749406/3a8b148f12e07c1d83c32d4ed26f618e.png"
         )
 
 
@@ -134,20 +119,10 @@ class CommandsCog(commands.Cog):
             
     async def get_mongo_latency(self):
         try:
-    
-    
-            mongo_db = await constants.mongo_setup()
-
-
-            if mongo_db is None:
-                print("Failed to connect to MongoDB.")
-                return -1
-
-
             start_time = time.time()
             
             
-            await mongo_db.command('ping')
+            await db.command('ping')
 
 
             mongo_latency = round((time.time() - start_time) * 1000)

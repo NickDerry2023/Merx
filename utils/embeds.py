@@ -4,7 +4,7 @@ from datetime import datetime
 from discord import Interaction
 from discord.ext import commands
 from discord.ui import View, Button, Modal, TextInput
-from cogs.utils.constants import MerxConstants
+from utils.constants import MerxConstants
 
 
 constants = MerxConstants()
@@ -20,8 +20,7 @@ class SuccessEmbed(discord.Embed):
             color=discord.Color.green(), 
             **kwargs
         )
-        
-        
+         
         
 # This is the missing aguments embed, we create this embed when someone forgets a command parameter for example member or option.
 # This makes it easier for users to correct their error in the command.
@@ -33,8 +32,7 @@ class MissingArgsEmbed(discord.Embed):
             description=f"<:xmark:1285350796841582612> You are missing the `{param_name}` argument.",
             color=discord.Color.red()
         )
-        
-        
+               
 
 # This is the bad aguments embed, we create this embed when someone gives a bad command parameter for example member or option.
 # This makes it easier for users to correct their error in the command.
@@ -48,7 +46,6 @@ class BadArgumentEmbed(discord.Embed):
         )
 
 
-
 # This is the forbidden error embed for when users perform forbidden actions using the bot and Discord API.
 
 class ForbiddenEmbed(discord.Embed):
@@ -58,7 +55,6 @@ class ForbiddenEmbed(discord.Embed):
             description="<:xmark:1285350796841582612> I couldn't send you a DM. Please check your DM settings.",
             color=discord.Color.red()
         )
-
 
 
 # This is the permission denied embed, this will be used for things like admin commands or places where certain roles
@@ -73,17 +69,15 @@ class MissingPermissionsEmbed(discord.Embed):
         )
 
 
-
 # This is the error embed, call the errors.py file as well as this file and class to pass an error
 
 class UserErrorEmbed(discord.Embed):
     def __init__(self, error_id):
         super().__init__(
             title="Something Went Wrong",
-            description=f"Please contact [Merx Support](https://discord.gg/merxbot)!\nError ID: `{error_id}`",
+            description=f"Please contact [Merx Support](https://discord.gg/merxbot) or email `support@merxbot.xyz`!\nError ID: `{error_id}`",
             color=discord.Color.red()
         )
-
 
 
 # Developer error embed.
@@ -101,7 +95,6 @@ class DeveloperErrorEmbed(discord.Embed):
         self.add_field(name='Command', value=f"Name: {ctx.command.qualified_name}\nArgs: {ctx.command.params}", inline=True)
         
 
-
 # This is the blacklist function for the blacklist system.
 
 class BlacklistEmbed(discord.Embed):
@@ -112,8 +105,7 @@ class BlacklistEmbed(discord.Embed):
             color=discord.Color.red()
         )
         self.add_field(name="Reason", value="Please contact support [here](https://discord.gg/merxbot for more details.")
-        
-        
+             
         
 # This is an informative embed
 
@@ -125,7 +117,6 @@ class InfoEmbed(discord.Embed):
             color=color, 
             **kwargs
         )
-
 
 
 # This is for the start of the setup command also known as the disclaimer
@@ -147,11 +138,10 @@ class DisclaimerView(discord.ui.View):
         )
 
 
-
 # This is the setup options view and it includes buttons
 
 class SetupOptionsView(discord.ui.View):
-    def __init__(self, show_bot_config: bool, show_banner_config: bool):
+    def __init__(self, show_bot_config: bool, show_plugin_config: bool, show_moderation_config: bool, show_administration_config: bool):
         super().__init__()
         if show_bot_config:
             self.add_item(discord.ui.Button(
@@ -161,17 +151,32 @@ class SetupOptionsView(discord.ui.View):
             )
            
             
-        if show_banner_config:
+        if show_plugin_config:
             self.add_item(discord.ui.Button(
-                label="Banner Config", 
+                label="Plugin Config", 
                 style=discord.ButtonStyle.gray, 
-                custom_id="banner_config")
+                custom_id="plugin_config")
+            )
+            
+            
+        if show_moderation_config:
+            self.add_item(discord.ui.Button(
+                label="Moderation Config", 
+                style=discord.ButtonStyle.gray, 
+                custom_id="moderation_config")
+            )
+            
+            
+        if show_administration_config:
+            self.add_item(discord.ui.Button(
+                label="Administration Config", 
+                style=discord.ButtonStyle.gray, 
+                custom_id="administration_config")
             )
             
             
         self.add_item(discord.ui.Button(label="Exit Setup", style=discord.ButtonStyle.red, custom_id="exit"))
         
-
 
 # This is the embed for cancelling setup
 
@@ -184,7 +189,6 @@ class ExitSetupEmbed(discord.Embed):
         )
         
         
-
 # This is for the new about command, edit the info for the command here instead of in the commands file.
 # This allows replication late of info in the about command.
 
@@ -238,7 +242,6 @@ class AboutEmbed:
         embed.set_thumbnail(url=thumbnail_url)
         return embed
     
-    
 
 # This passes the about pages buttons with the embed so that these do not need to be recalled.
 
@@ -267,7 +270,6 @@ class AboutWithButtons:
 
 
         return view
-
 
 
 # This is a debug command emebed that accepts parameters.    
@@ -307,8 +309,7 @@ class DebugEmbed(discord.Embed):
         # Set footer with requesting user details
         
         self.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar.url)
-        
-        
+               
         
 # This is the embed for the bots help center. This embed is the inital embed that shows that
 # tells the user how to use the help center.
@@ -320,8 +321,7 @@ class HelpCenterEmbed(discord.Embed):
             description=description,
             color=color
         )
-        
-        
+           
         
 # This is the Nickname success embed. This will tell who was nicknamed, who nicknamed them,
 # and what their previous and new name is. We do this in this file to allow it to be
@@ -338,8 +338,7 @@ class NicknameSuccessEmbed(discord.Embed):
             ),
             color=discord.Color.green()
         )
-        
-        
+          
         
 # This is the server information emebed logic, this will accept things like server roles, channel counts,
 # emojies, and much more. This embed will also format it like circle does. Simply call this emebed then pass
@@ -430,23 +429,20 @@ class ServerInformationEmbed:
 
         return embed
     
-    
 
 # This is the role success emebed for when a action is performed with roles.
     
 class RoleSuccessEmbed(discord.Embed):
     def __init__(self, title: str, description: str):
         super().__init__(title=title, description=description, color=discord.Color.green())
-        
-        
+         
         
 # This is the channel success emebed for when channel and category functions are used.        
         
 class ChannelSuccessEmbed(discord.Embed):
     def __init__(self, title: str, description: str):
         super().__init__(title=title, description=description, color=discord.Color.green())
-        
-        
+           
 
 class SearchResultEmbed(discord.Embed):
     def __init__(self, title: str, description: str, case_number: int, collection: str, details: str):
@@ -454,8 +450,7 @@ class SearchResultEmbed(discord.Embed):
         self.add_field(name="Case Number", value=case_number, inline=False)
         self.add_field(name="Collection", value=collection, inline=False)
         self.add_field(name="Details", value=details, inline=False)
-        
-      
+           
  
 # This contains the emebed and its parameters for the ping command. This shows things like uptime,
 # latency to discors and mongodb.        
@@ -476,84 +471,153 @@ class PingCommandEmbed(discord.Embed):
                   f"> **Build Version:** {version}\n",
             inline=False
         )
-
+        
 
         return embed
-    
-    
+      
     
 # This is the embed for User Information command also known as whois. 
 
 class UserInformationEmbed:
-    def __init__(self, member, constants):
+    def __init__(self, member, constants, merx):
         self.member = member
+        self.merx = merx
         self.constants = constants
 
 
 
-    def create_embed(self):
+    async def create_embed(self):
 
-
-        user_mention = self.member.mention
-        display_name = self.member.display_name
-        user_id = self.member.id
-        account_created = f"<t:{int(self.member.created_at.timestamp())}:F>"
-        joined_server = f"<t:{int(self.member.joined_at.timestamp())}:F>" if self.member.joined_at else "N/A"
-        roles = [role.mention for role in self.member.roles if role.name != "@everyone"]
-        role_count = len(roles)
-        
-        
-        badges = []
-        flags = self.member.public_flags
-
-
-        if flags.hypesquad_bravery:
-            badges.append("> <:houseBravery:1287991028950761523> HypeSquad Bravery")
-        if flags.hypesquad_brilliance:
-            badges.append("> <:houseBrilliance:1287990589773840416> HypeSquad Brilliance")
-        if flags.hypesquad_balance:
-            badges.append("> <:houseBalance:1287990232591106069> HypeSquad Balance")
-        if flags.verified_bot:
-            badges.append("> <:verified:1287994141036384330> Verified Bot")
-        if flags.early_supporter:
-            badges.append("> <:EarlyVerifiedDeveloperBadge:1287990726751162368> Early Supporter")
-        if flags.active_developer:
-            badges.append("> <:DeveloperBadge:1287990849640075318> Active Developer")
-
-
-        embed = discord.Embed(
-            title=f"User Info - {display_name}",
-            color=self.constants.merx_embed_color_setup(),
-            timestamp=datetime.utcnow()
-        )
-
-
-        embed.add_field(
-            name="**User Information**", 
-            value=f"> **Mention:** {user_mention}\n"
-                  f"> **Display Name:** {display_name}\n"
-                  f"> **User ID:** {user_id}\n"
-                  f"> **Account Created:** {account_created}\n"
-                  f"> **Joined Server:** {joined_server}", 
-            inline=False
-        )
-
-
-        if badges:
-            embed.add_field(name="Badges", value='\n'.join(badges), inline=False)
-        else:
-            embed.add_field(name="Badges", value="No badges", inline=False)
+        try:
+            user_mention = self.member.mention
+            display_name = self.member.display_name
+            user_id = self.member.id
+            account_created = f"<t:{int(self.member.created_at.timestamp())}:F>"
+            joined_server = f"<t:{int(self.member.joined_at.timestamp())}:F>" if self.member.joined_at else "N/A"
+            roles = [role.mention for role in self.member.roles if role.name != "@everyone"]
+            role_count = len(roles)
             
-
-        embed.add_field(name=f"Roles ({role_count})", value=', '.join(roles) if roles else "No Roles", inline=False)
-
-
-        if self.member.bot:
-            embed.set_footer(text="This user is a bot.")
             
+            badges = []
+            flags = self.member.public_flags
+
+
+            if flags.hypesquad_bravery:
+                badges.append("> <:houseBravery:1287991028950761523> HypeSquad Bravery")
+            if flags.hypesquad_brilliance:
+                badges.append("> <:houseBrilliance:1287990589773840416> HypeSquad Brilliance")
+            if flags.hypesquad_balance:
+                badges.append("> <:houseBalance:1287990232591106069> HypeSquad Balance")
+            if flags.verified_bot:
+                badges.append("> <:verified:1287994141036384330> Verified Bot")
+            if flags.early_supporter:
+                badges.append("> <:EarlyVerifiedDeveloperBadge:1287990726751162368> Early Supporter")
+            if flags.active_developer:
+                badges.append("> <:DeveloperBadge:1287990849640075318> Active Developer")
+            
+            try:
+                guild = self.merx.get_guild(1285107028892717118)
+                guild_member = await guild.fetch_member(self.member.id)
+                staff_roles = [
+                    1285107029093912637, # Merx Team
+                    1285107029093912636, # Development Team
+                    1286165370926792806, # Management Team
+                    1285107029060489232, # Management 2
+                    1285107029005959206, # Support Team
+                ]
+
+                for role_id in staff_roles:
+                    if discord.utils.get(guild_member.roles, id=role_id):
+                        badges.append("> <:Merx:1290733278885576724> Merx Staff")
+                        break
+            except discord.NotFound:
+                print("Member not found.")
+            except discord.Forbidden:
+                print("Bot does not have permission to fetch this member.")
+            except Exception as e:
+                print(f"Error running the role check: {e}")
+
+            embed = discord.Embed(
+                title=f"User Info - {display_name}",
+                color=self.constants.merx_embed_color_setup(),
+                timestamp=datetime.utcnow()
+            )
+
+
+            embed.add_field(
+                name="**User Information**", 
+                value=f"> **Mention:** {user_mention}\n"
+                    f"> **Display Name:** {display_name}\n"
+                    f"> **User ID:** {user_id}\n"
+                    f"> **Account Created:** {account_created}\n"
+                    f"> **Joined Server:** {joined_server}", 
+                inline=False
+            )
+
+            embed.set_thumbnail(url=self.member.display_avatar.url)
+
+
+            if badges:
+                embed.add_field(name="Badges", value='\n'.join(badges), inline=False)
+            else:
+                embed.add_field(name="Badges", value="No badges", inline=False)
+                
+
+            embed.add_field(name=f"Roles ({role_count})", value=', '.join(roles) if roles else "No Roles", inline=False)
+
+
+            if self.member.bot:
+                embed.set_footer(text="This user is a bot.")
+        except Exception:
+            user_mention = self.member.mention
+            display_name = self.member.display_name
+            user_id = self.member.id
+            account_created = f"<t:{int(self.member.created_at.timestamp())}:F>"
+
+            badges = []
+            flags = self.member.public_flags
+
+            if flags.hypesquad_bravery:
+                badges.append("> <:houseBravery:1287991028950761523> HypeSquad Bravery")
+            if flags.hypesquad_brilliance:
+                badges.append("> <:houseBrilliance:1287990589773840416> HypeSquad Brilliance")
+            if flags.hypesquad_balance:
+                badges.append("> <:houseBalance:1287990232591106069> HypeSquad Balance")
+            if flags.verified_bot:
+                badges.append("> <:verified:1287994141036384330> Verified Bot")
+            if flags.early_supporter:
+                badges.append("> <:EarlyVerifiedDeveloperBadge:1287990726751162368> Early Supporter")
+            if flags.active_developer:
+                badges.append("> <:DeveloperBadge:1287990849640075318> Active Developer")
+            
+            embed = discord.Embed(
+                title=f"User Info - {display_name}",
+                color=self.constants.merx_embed_color_setup(),
+                timestamp=datetime.utcnow()
+            )
+
+
+            embed.add_field(
+                name="**User Information**", 
+                value=f"> **Mention:** {user_mention}\n"
+                    f"> **Display Name:** {display_name}\n"
+                    f"> **User ID:** {user_id}\n"
+                    f"> **Account Created:** {account_created}\n",
+                inline=False
+            )
+
+            embed.set_thumbnail(url=self.member.display_avatar.url)
+
+
+            if badges:
+                embed.add_field(name="Badges", value='\n'.join(badges), inline=False)
+            else:
+                embed.add_field(name="Badges", value="No badges", inline=False)
+            
+            if self.member.bot:
+                embed.set_footer(text="This user is a bot.")
 
         return embed
-
 
 
 class CheckGuildEmbed(discord.Embed):
@@ -590,7 +654,7 @@ class CheckGuildEmbed(discord.Embed):
         )
 
         return embed
-    
+
     
 # This specifices the afk emebed error, telling use
     
@@ -600,7 +664,7 @@ class AfkEmbed(discord.Embed):
     def __init__(self, user: discord.User, reason: str):
         super().__init__(
             title=f"{user.name} is currently AFK",
-            description=f"> Reason: {reason}",
+            description=f"> Message: {reason}",
             color=constants.merx_embed_color_setup()
         )
         
@@ -634,7 +698,6 @@ class EmojiFindEmbed:
 
         return embed
     
-    
 
 # This is the embed for the Auto Moderation feature that gets the list of banned words from
 # Mongo Db then lists it in a nice way.
@@ -644,7 +707,6 @@ class AutoModListWordsEmbed(discord.Embed):
         super().__init__(title=f"Banned Words for {guild_name}", color=color)
         self.add_field(name="Banned Words", value=banned_words, inline=False)
         self.set_footer(text=f"Total words: {len(banned_words.split(', '))}")
-        
         
         
 # This is the embed that shows the current prefix for the bot.
@@ -658,7 +720,6 @@ class PrefixEmbed(discord.Embed):
         )
 
 
-
 # This is the success embed when the bots prefix is successfully changed by the user.
 
 class PrefixSuccessEmbed(discord.Embed):
@@ -668,8 +729,7 @@ class PrefixSuccessEmbed(discord.Embed):
             description=f"<:whitecheck:1285350764595773451> Prefix successfully changed to `{new_prefix}`.",
             color=discord.Color.green()
         )
-        
-        
+           
         
 # This is the reminders success embed that shows when a reminder is successfully set.
 
@@ -681,3 +741,31 @@ class ReminderEmbed(discord.Embed):
         self.title = ""
         self.description = f"<:whitecheck:1285350764595773451> Got it! I have set a reminder. It will go off at **{reminder_time}**."
         self.color = discord.Color.green()
+        
+        
+# This is the Roles Information Embed that shows information about certain roles.        
+        
+class RolesInformationEmbed:
+    @staticmethod
+    def create(role: discord.Role, target):
+        embed = discord.Embed(
+            title=f"Role Information: {role.name}",
+            color=constants.merx_embed_color_setup()
+        )
+        embed.add_field(name="Role ID", value=role.id, inline=False)
+        embed.add_field(name="Role Color", value=str(role.color), inline=False)
+        embed.add_field(name="Members", value=len(role.members), inline=False)
+        embed.add_field(name="Mentionable", value=role.mentionable, inline=False)
+        embed.add_field(name="Hoisted", value=role.hoist, inline=False)
+        embed.add_field(name="Position", value=role.position, inline=False)
+        embed.add_field(
+            name="Permissions",
+            value=', '.join(perm[0] for perm in role.permissions if perm[1]),
+            inline=False
+        )
+
+        if isinstance(target, discord.Interaction):
+            return embed  # We'll handle the response in the calling code
+        else:
+            embed.set_footer(text=f"Requested by {target.author}", icon_url=target.author.avatar.url)
+            return embed

@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-from cogs.utils.constants import MerxConstants
-from cogs.utils.embeds import PrefixEmbed, PrefixSuccessEmbed
+from utils.constants import MerxConstants, prefixes
+from utils.embeds import PrefixEmbed, PrefixSuccessEmbed
 
 constants = MerxConstants()
 
@@ -15,24 +15,12 @@ class ChangePrefixCommandCog(commands.Cog):
     @commands.has_guild_permissions(manage_guild=True)
     async def prefix(self, ctx, prefix: str = None):
         
-        
-        mongo_db = await constants.mongo_setup()
-
-
-        if mongo_db is None:
-            await ctx.send("<:xmark:1285350796841582612> Failed to connect to the database. Please try again later.", ephemeral=True)
-            return
-        
-
-        prefixes_collection = mongo_db['prefixes']
-        
-
         if prefix is None:
             
             
             # Fetch the current prefix if no new prefix is provided
             
-            current_prefix_doc = await prefixes_collection.find_one({"guild_id": str(ctx.guild.id)})
+            current_prefix_doc = await prefixes.find_one({"guild_id": str(ctx.guild.id)})
             current_prefix = current_prefix_doc.get("prefix", "!")
             embed = PrefixEmbed(current_prefix)
             await ctx.send(embed=embed)
@@ -43,7 +31,7 @@ class ChangePrefixCommandCog(commands.Cog):
             
             # Update the prefix if the user provides a new one
             
-            result = await prefixes_collection.update_one(
+            result = await prefixes.update_one(
                 {"guild_id": str(ctx.guild.id)},
                 {"$set": {"prefix": prefix}},
                 upsert=True

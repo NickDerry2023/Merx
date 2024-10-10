@@ -1,7 +1,7 @@
 import discord
 import uuid
 from discord.ext import commands
-from cogs.utils.constants import MerxConstants
+from utils.constants import MerxConstants, notes
 
 constants = MerxConstants()
 
@@ -12,18 +12,7 @@ class NoteCommandsCog(commands.Cog):
     
     
     @commands.hybrid_command(descriptions="Adds a moderator note to a user.", with_app_command=True, extras={"category": "Moderation"})
-    async def add_note(self, ctx: commands.Context, member: discord.Member, reason):
-        mongo_db = await constants.mongo_setup()
-
-
-        if mongo_db is None:
-            
-            await ctx.send("<:xmark:1285350796841582612> Failed to connect to the database. Please try again later.", ephemeral=True)
-            return
-        
-        notes_collection = mongo_db['notes']
-
-        
+    async def add_note(self, ctx: commands.Context, member: discord.Member, reason):        
         note_id = f"Note #{str(uuid.uuid4().int)[:4]}"
 
         note_entry = {
@@ -38,7 +27,7 @@ class NoteCommandsCog(commands.Cog):
             "timestamp": ctx.message.created_at.isoformat() 
         }
 
-        notes_collection.insert_one(note_entry)
+        notes.insert_one(note_entry)
 
         await ctx.send(f"<:warning:1285350764595773451> **{note_id}** has been logged for {member}.")
 
@@ -46,18 +35,7 @@ class NoteCommandsCog(commands.Cog):
 
     @commands.hybrid_command(descriptions="Delete a note on a user", with_app_command=True, extras={"category": "Moderation"})
     async def remove_note(self, ctx: commands.Context, id):
-        mongo_db = await constants.mongo_setup()
-
-
-        if mongo_db is None:
-            
-            await ctx.send("<:xmark:1285350796841582612> Failed to connect to the database. Please try again later.", ephemeral=True)
-            return
-        
-        
-        notes_collection = mongo_db['notes']
-
-        notes_collection.delete_one({"note_id": f"Note #{id}"})
+        notes.delete_one({"note_id": f"Note #{id}"})
 
         await ctx.send(f"<:warning:1285350764595773451> **Note #{id}** has been removed.")
 
@@ -65,19 +43,7 @@ class NoteCommandsCog(commands.Cog):
 
     @commands.hybrid_command(descriptions="Search for a note on a user", with_app_command=True, extras={"category": "Moderation"})
     async def lookup_note(self, ctx: commands.Context, id):
-        mongo_db = await constants.mongo_setup()
-
-
-        if mongo_db is None:
-            
-            await ctx.send("<:xmark:1285350796841582612> Failed to connect to the database. Please try again later.", ephemeral=True)
-            return
-        
-        
-        notes_collection = mongo_db['notes']
-
-        
-        result = await notes_collection.find_one({"note_id": f"Note #{id}"})
+        result = await notes.find_one({"note_id": f"Note #{id}"})
 
         if result:
             user_id = result.get('noted_user_id', 'N/A')

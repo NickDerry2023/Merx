@@ -1,10 +1,8 @@
 import discord
-import asyncio
 import uuid
-import shortuuid
 from discord.ext import commands
-from cogs.utils.embeds import DebugEmbed, CheckGuildEmbed
-from cogs.utils.constants import MerxConstants
+from utils.embeds import DebugEmbed, CheckGuildEmbed
+from utils.constants import MerxConstants
  
 
 
@@ -17,8 +15,6 @@ constants = MerxConstants()
 class AdminCommandsCog(commands.Cog):
     def __init__(self, merx):
         self.merx = merx
-        self.merx.loop.create_task(constants.mongo_setup())
-
 
 
     @commands.command()
@@ -202,7 +198,7 @@ class AdminCommandsCog(commands.Cog):
         
         
         if not bypassed:
-            await self.send_message(ctx, embed=PermissionDeniedEmbed())
+            # await self.send_message(ctx, embed)
             return
 
 

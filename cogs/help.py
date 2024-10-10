@@ -1,11 +1,8 @@
 import discord
-import asyncio
-import uuid
-import shortuuid
 from discord.ext import commands
 from discord.ui import Select, View
-from cogs.utils.constants import MerxConstants
-from cogs.utils.embeds import HelpCenterEmbed
+from utils.constants import MerxConstants
+from utils.embeds import HelpCenterEmbed
 
 
 # Brand new help command that uses a drop down and hidden messages to display content in
@@ -55,6 +52,7 @@ class HelpCommandsCog(commands.Cog):
                 )
                 
                 await interaction.response.send_message(embed=embed, ephemeral=True)
+                await interaction.message.edit() # DONT REMOVE IT RESETS THE DROPDOWN
 
 
             # Gets the commands in the catagory and prepares them to be listed.

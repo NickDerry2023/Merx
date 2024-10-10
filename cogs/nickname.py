@@ -1,10 +1,7 @@
 import discord
-import asyncio
-import uuid
-import shortuuid
 from discord.ext import commands
-from cogs.utils.embeds import NicknameSuccessEmbed
-from cogs.utils.constants import MerxConstants
+from utils.embeds import NicknameSuccessEmbed
+from utils.constants import MerxConstants
  
 
 

@@ -1,10 +1,9 @@
 import discord
-import asyncio
 import time
 from discord.ext import commands
 from collections import defaultdict
-from cogs.utils.embeds import DebugEmbed, SuccessEmbed, AutoModListWordsEmbed
-from cogs.utils.constants import MerxConstants
+from utils.embeds import AutoModListWordsEmbed
+from utils.constants import MerxConstants, db
  
 
 
@@ -22,22 +21,11 @@ class AutoModCommandCog(commands.Cog):
 
 
     async def cog_load(self):
-        
-
-        mongo_db = await constants.mongo_setup()
-
-        if mongo_db is None:
-
-            
-            print("Failed to connect to the database.")
-            return
-
-
         # Fetch blacklisted words and log channel after ensuring MongoDB connection is established
         
-        await self.fetch_banned_words(mongo_db)
-        await self.fetch_logging_channel(mongo_db)
-        await self.fetch_blacklist_bypass(mongo_db)
+        await self.fetch_banned_words(db)
+        await self.fetch_logging_channel(db)
+        await self.fetch_blacklist_bypass(db)
         
         
     

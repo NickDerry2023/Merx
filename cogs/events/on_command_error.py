@@ -1,23 +1,17 @@
 import discord
 from discord.ext import commands
 from zuid import ZUID
-from cogs.utils.embeds import MissingArgsEmbed, BadArgumentEmbed, ForbiddenEmbed, MissingPermissionsEmbed, UserErrorEmbed, DeveloperErrorEmbed
+from utils.embeds import MissingArgsEmbed, BadArgumentEmbed, ForbiddenEmbed, MissingPermissionsEmbed, UserErrorEmbed, DeveloperErrorEmbed
 
 
 class OnCommandError(commands.Cog):
     def __init__(self, merx):
         self.merx = merx
         
-        
-
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error):
-        
-        
         error_id = ZUID(prefix="error_", length=10)
         error_id = error_id()
-        
-        
         
         if isinstance(error, commands.MissingRequiredArgument):
             embed = MissingArgsEmbed(error.param.name)
@@ -40,7 +34,9 @@ class OnCommandError(commands.Cog):
         elif isinstance(error, commands.MissingPermissions):
             embed = MissingPermissionsEmbed()
             return await ctx.send(embed=embed)
-
+        
+        elif error == "You are blacklisted from using this bot.":
+            return
 
 
         else:

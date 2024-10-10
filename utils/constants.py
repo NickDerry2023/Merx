@@ -1,69 +1,50 @@
 import os
 import discord
-from discord.ext import commands
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 
 
+load_dotenv()
+
+
+mongodb_url = os.getenv('MONGODB_URL')
+mongodb_db = os.getenv('MONGODB_DB')
+client = AsyncIOMotorClient(mongodb_url)
+db = client[mongodb_db]
+
+
+afks = db.afks
+blacklist_bypass = db.blacklist_bypass
+blacklistedwords = db.blacklistedwords
+blacklists = db.blacklists
+notes = db.notes
+prefixes = db.prefixes
+reminders = db.reminders
+setup_col = db.setup
+verify_waiting = db.verify_waiting
+cases = db.cases
+guild_counters = db.guild_counters
+
+
 class MerxConstants:
     def __init__(self):
-        load_dotenv()
         self.mongo_client = None
         self.mongo_db = None
         self.bypassed_users = []
         self.blacklists = []
         self.server_blacklists = []
-        
-
-
-    # Setup MongoDB connection from environment variables
-    
-    async def mongo_setup(self):
-        if self.mongo_client is None:
-            try:
-                mongodb_url = os.getenv('MONGODB_URL')
-                mongodb_db = os.getenv('MONGODB_DB')
-
-                if not mongodb_url or not mongodb_db:
-                    print("MongoDB URL or Database name not found in environment variables.")
-                    return None
-
-
-                self.mongo_client = AsyncIOMotorClient(mongodb_url)
-                self.mongo_db = self.mongo_client[mongodb_db]
-
-
-                # Test the connection by running a simple command
-                
-                await self.mongo_db.command("ping")
-                print("Successfully connected to MongoDB.")
-                
-                
-            except Exception as e:
-                print(f"Failed to connect to MongoDB: {str(e)}")
-                return None
-
-        return self.mongo_db
-    
-    
     
     # Checks the users to see if they are blacklist bypasssed and bot owner. This function
     # will get the User IDs from MongoDB and can be called to see if users are allowed to
     # run commands.
     
     async def fetch_bypassed_users(self):
-        
-        
-        if self.mongo_db is None:
-            await self.mongo_setup()
-
-
         try:
-            collection = self.mongo_db["blacklist_bypass"]
-            cursor = collection.find({}, {"discord_id": 1})
+            results = blacklist_bypass.find({}, {"discord_id": 1})
+
             bypassed_users = []
-            async for document in cursor:
-                bypassed_users.append(document["discord_id"])
+            async for result in results:
+                bypassed_users.append(result.get('discord_id'))
 
             self.bypassed_users = bypassed_users
 
@@ -98,6 +79,30 @@ class MerxConstants:
         if not isinstance(token, str):
             raise TypeError(f'expected token to be a str, received {type(token).__name__} instead')
         return token
+    
+    
+    
+    def merx_client_id_setup(self):
+        token = os.getenv('CLIENT_ID')
+        if not isinstance(token, str):
+            raise TypeError(f'expected token to be a str, received {type(token).__name__} instead')
+        return token
+    
+    
+    
+    def merx_client_secret_setup(self):
+        token = os.getenv('CLIENT_SECRET')
+        if not isinstance(token, str):
+            raise TypeError(f'expected token to be a str, received {type(token).__name__} instead')
+        return token
+    
+    
+    
+    def merx_redirect_uri_setup(self):
+        token = os.getenv('REDIRECT_URL')
+        if not isinstance(token, str):
+            raise TypeError(f'expected token to be a str, received {type(token).__name__} instead')
+        return token
 
 
 
@@ -123,16 +128,9 @@ class MerxConstants:
     
     
     
-    async def fetch_blacklisted_users(self):
-        
-        
-        if self.mongo_db is None:
-            await self.mongo_setup()
-            
-            
+    async def fetch_blacklisted_users(self):    
         try:
-            collection = self.mongo_db["blacklists"]
-            cursor = collection.find({}, {"discord_id": 1})
+            cursor = db.blacklists.find({}, {"discord_id": 1})
             
             
             blacklists = []
@@ -149,15 +147,8 @@ class MerxConstants:
 
 
     async def fetch_blacklisted_guilds(self):
-        
-        
-        if self.mongo_db is None:
-            await self.mongo_setup()
-            
-            
         try:
-            collection = self.mongo_db["blacklists"]
-            cursor = collection.find({}, {"discord_id": 1})
+            cursor = blacklists.find({}, {"discord_id": 1})
             server_blacklists = []
             
             
@@ -172,15 +163,9 @@ class MerxConstants:
     
 
     async def fetch_server_prefix(self, guild):
-        
-        
-        mongo_db = await self.mongo_setup()
-        prefixes_collection = mongo_db['prefixes']
-
-
         # Use the async method from the motor driver
         
-        result = await prefixes_collection.find_one({"guild_id": str(guild.id)})
+        result = await prefixes.find_one({"guild_id": str(guild.id)})
         
         
         if result and 'prefix' in result:

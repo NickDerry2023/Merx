@@ -1,144 +1,56 @@
 import discord
-import asyncio
-import uuid
-import shortuuid
 from discord.ext import commands
-from cogs.utils.constants import MerxConstants
-from cogs.utils.embeds import UserInformationEmbed, SuccessEmbed
- 
-
-
-constants = MerxConstants()
-
+from datetime import datetime
+from utils.constants import MerxConstants, cases
 
 class ModLogsCommandCog(commands.Cog):
     def __init__(self, merx):
         self.merx = merx
         self.constants = MerxConstants()
 
-
-
-    # This is the logic to get mod logs from the MongoDB database. This gets the modlogs from the diffrent collections.
-
-    async def getModLogsLogic(self, user_id):
-        
-        
-        mongo_db = await self.constants.mongo_setup()
-        
-        
-        if mongo_db is None:
-            return None, "Failed to connect to the database."
-        
-        
-        warn_collection = mongo_db["warns"]
-        bans = mongo_db["bans"]
-        blacklist_collection = mongo_db["blacklists"]
-
-
-        warnings = await warn_collection.find({"warned_user_id": str(user_id)}).to_list(length=None)
-        bans = await bans.find({"banned_user_id": str(user_id)}).to_list(length=None)
-        blacklists = await blacklist_collection.find({"discord_id": str(user_id)}).to_list(length=None)
-        
-        
-        logs = {
-            "warnings": warnings,
-            "bans": bans,
-            "blacklists": blacklists
-        }
-        
-        
-        return logs, None
+    @commands.hybrid_group(description="Group command")
+    async def modlogs(self, ctx: commands.Context):
+        return
     
+    @modlogs.command(description="View all modlogs for certain user", with_app_command=True, extras={"category": "Moderation"})
+    async def view(self, ctx, member: discord.Member):  
+        number = 0
+        
+        embed = discord.Embed(title=f"", description="", color=self.constants.merx_embed_color_setup(), timestamp=datetime.utcnow())
+        results = cases.find({'user_id': member.id, "guild_id": ctx.guild.id})
+        async for result in results:
+            if result.get('status') == "active":
+                number += 1
+                embed.add_field(name=f"Case ID: {result.get('case_id')} | {result.get('type').title()}", value=f"Reason: {result.get('reason')}\nModerator: <@{result.get('moderator_id')}> ({result.get('moderator_id')})\nDate: <t:{result.get('timestamp')}:F>", inline=False)
+        
+        if number == 0:
+            embed = discord.Embed(title="Not Found", description="No mod logs could be found for this user!", color=self.constants.merx_embed_color_setup())
+        else:
+            try:
+                embed.set_author(name=f"{member.name}\'s Modlogs", icon_url=member.avatar.url)
+            except:
+                embed.set_author(name=f"{member.name}\'s Modlogs", icon_url=member.default_avatar.url)
+            embed.set_footer(text=f"ID: {member.id} • Total Modlogs: {number}")
+        await ctx.send(embed=embed)
+
+    @modlogs.command(description="Transfer all modlogs to a different user", with_app_command=True, extras={"category": "Moderation"})
+    async def transfer(self, ctx, olduser: discord.Member = None, newuser: discord.Member = None): 
+        results = cases.find({'user_id': olduser.id, "guild_id": ctx.guild.id})
+        async for result in results:
+            is_deleted = await cases.find_one_and_update({'case_id': result.get('case_id'), 'user_id': result.get('user_id'), 'guild_id': result.get('guild_id')}, {'$set': {'user_id': newuser.id}})
+            if not is_deleted:
+                await ctx.send(f"{result.get('case_id')} was not able to be updated!")
+        await ctx.send(f"All moderation logs for **{olduser.name}** have been transfered to **{newuser}**")
     
-    
-    # This is the logic to actually proccess the transfer of the modlogs.
-    
-    async def transferUpdateModLogsLogic(self, user_id, logs):
-        
-        
-        mongo_db = await self.constants.mongo_db()
-        
-        
-        if mongo_db is None:
-            return "Failed to connect to the database"
-        
-        
-        warn_collection = mongo_db["warns"]
-        bans = mongo_db["bans"]
-        blacklist_collection = mongo_db["blacklists"]
-        
-        
-        if logs['warnings']:
-            for warn in logs['warnings']:
-                
-                
-                await warn_collection.update_one({"_id": warn["_id"]}, {"$set": {"warned_user_id": str(user_id)}})
-                
-                
-        if logs['bans']:
-            for ban in logs['bans']:
-                
-                
-                await bans.update_one({"_id": ban["_id"]}, {"$set": {"banned_user_id": str(user_id)}})
-                
-                
-        if logs['blacklists']:
-            for blacklist in logs['blacklists']:
-                
-                
-                await blacklist_collection.update_one({"_id": blacklist["_id"]}, {"$set": {"discord_id": str(user_id)}})
+    @modlogs.command(description="Clear all modlogs for a certain user", with_app_command=True, extras={"category": "Moderation"})
+    async def clear(self, ctx, member: discord.Member = None):
+        results = cases.find({'user_id': member.id, "guild_id": ctx.guild.id})
+        async for result in results:
+            case_info = await cases.find_one_and_update({'case_id': result.get('case_id'), 'guild_id': ctx.guild.id}, {'$set': {'status': 'cleared'}})
+            if not case_info:
+                await ctx.send(f"{result.get('case_id')} was not able to be deleted!")
 
-
-
-    # This is the logic to proccess the deletion of a modlog.
-
-    async def deleteModLogsLogic(self, user_id):
-        
-        mongo_db = await self.constants.mongo_db()
-        
-        
-        if mongo_db is None:
-            return "Failed to connect to the database"
-        
-        
-        warn_collection = mongo_db["warns"]
-        bans = mongo_db["bans"]
-        blacklist_collection = mongo_db["blacklists"]
-        
-        
-        return None
-
-
-
-    # This is the set of commands that will be used via Discord to actually carry out the transfer and clearing of modlogs.
-
-    @commands.hybrid_command(description="Allows users to transfer modlogs from one user to another.", with_app_command=True, extras={"category": "Moderation"})
-    async def transfermodlogs(self, ctx, member_from: discord.Member = None, member_to: discord.Member = None):
-        
-        
-        if not member_from or not member_to:
-            await ctx.send(embed=ErrorEmbed(description="You must specify both the source and destination members."))
-            return
-        
-        
-        await self.delete_modlogs(member_from.id)
-
-        await ctx.send(embed=SuccessEmbed(description=f"Mod logs have been transferred from {member_from.display_name} to {member_to.display_name}."))
-
-        
-        
-    # Command to clear modlogs.
-    
-    @commands.hybrid_command(description="Allows users to delete modlogs from a user.", with_app_command=True, extras={"category": "Moderation"})
-    async def clearmodlogs(self, ctx, member: discord.Member = None):
-        
-        
-        if not member:
-            await ctx.send(embed=ErrorEmbed(description="You must specify a member to clear mod logs for."))
-            return
-
-
-        await ctx.send(embed=SuccessEmbed(description=f"All mod logs for {member.display_name} have been cleared."))
+        await ctx.send(f"All moderation logs have been cleared for **{member.name}**.")
 
 
 

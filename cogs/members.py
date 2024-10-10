@@ -1,6 +1,5 @@
 import discord
-import math
-from cogs.utils.constants import MerxConstants
+from utils.constants import MerxConstants
 from discord.ext import commands
 
 
@@ -46,6 +45,55 @@ class MembersCommandsCog(commands.Cog):
             inline=False
         )
 
+        
+        await ctx.send(embed=embed)
+        
+        
+        
+    @commands.hybrid_command(description="This lists the servers members", with_app_command=True, extras={"category": "General"})
+    async def membercount(self, ctx: commands.Context):
+        guild = ctx.guild
+
+        if not guild.chunked:
+            await guild.chunk()
+
+        member_count = guild.member_count
+        server_boosts = guild.premium_subscription_count
+
+        # online_members = []
+        # for member in guild.members:
+        #     print(member.status)
+        # return
+
+        # online_members = len([member for member in guild.members if member.status != discord.Status.offline])
+        server_icon_url = guild.icon.url if guild.icon else None
+        server_name = guild.name
+        
+        embed = discord.Embed(
+            description="",
+            color=constants.merx_embed_color_setup()
+        )
+        
+        if server_icon_url:
+            embed.set_author(name=server_name, icon_url=server_icon_url)
+
+        embed.add_field(
+            name="Member Count",
+            value=member_count,
+            inline=True
+        )
+        
+        # embed.add_field(
+        #     name="Online Members",
+        #     value=online_members,
+        #     inline=True
+        # )
+        
+        embed.add_field(
+            name="Server Boosts",
+            value=server_boosts,
+            inline=True
+        )
         
         await ctx.send(embed=embed)
 

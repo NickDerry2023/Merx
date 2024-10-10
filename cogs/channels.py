@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from cogs.utils.embeds import ChannelSuccessEmbed
+from utils.embeds import ChannelSuccessEmbed
  
 
 class ChannelCommandCog(commands.Cog):
