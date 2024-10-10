@@ -39,8 +39,8 @@ class ModLogsCommandCog(commands.Cog):
         async for result in results:
             is_deleted = await cases.find_one_and_update({'case_id': result.get('case_id'), 'user_id': result.get('user_id'), 'guild_id': result.get('guild_id')}, {'$set': {'user_id': newuser.id}})
             if not is_deleted:
-                await ctx.send(f"{result.get('case_id')} was not able to be updated!")
-        await ctx.send(f"All moderation logs for **{olduser.name}** have been transfered to **{newuser}**")
+                await ctx.send(f"<:xmark:1285350796841582612> {result.get('case_id')} was not able to be updated!")
+        await ctx.send(f"<:whitecheck:1285350764595773451> All moderation logs for **{olduser.name}** have been transfered to **{newuser}**")
     
     @modlogs.command(description="Clear all modlogs for a certain user", with_app_command=True, extras={"category": "Moderation"})
     async def clear(self, ctx, member: discord.Member = None):
@@ -48,9 +48,9 @@ class ModLogsCommandCog(commands.Cog):
         async for result in results:
             case_info = await cases.find_one_and_update({'case_id': result.get('case_id'), 'guild_id': ctx.guild.id}, {'$set': {'status': 'cleared'}})
             if not case_info:
-                await ctx.send(f"{result.get('case_id')} was not able to be deleted!")
+                await ctx.send(f"<:xmark:1285350796841582612> {result.get('case_id')} was not able to be deleted!")
 
-        await ctx.send(f"All moderation logs have been cleared for **{member.name}**.")
+        await ctx.send(f"<:whitecheck:1285350764595773451> All moderation logs have been cleared for **{member.name}**.")
 
 
 

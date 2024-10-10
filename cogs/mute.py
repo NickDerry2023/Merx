@@ -29,7 +29,7 @@ class MuteCommandCog(commands.Cog):
 
         await member.timeout(until, reason=reason)
         
-        await ctx.send(f"**{member.name}** has been muted for {minutes} minutes!")
+        await ctx.send(f"<:whitecheck:1285350764595773451> **{member.name}** has been muted for {minutes} minutes!")
 
     @commands.hybrid_command(description="Remove timeout from a certain user", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_permissions(moderate_members=True)
@@ -47,7 +47,7 @@ class MuteCommandCog(commands.Cog):
             pass
 
         await member.timeout(None, reason=reason)
-        await ctx.send(f"**{member.name}** has been unmuted!")
+        await ctx.send(f"<:whitecheck:1285350764595773451> **{member.name}** has been unmuted!")
 
 
 

@@ -32,9 +32,9 @@ class CaseSearchCog(commands.Cog):
     async def void(self, ctx: commands.Context, *, caseid: int):
         case_info = await cases.find_one_and_update({'case_id': caseid, 'guild_id': ctx.guild.id}, {'$set': {'status': 'cleared'}})
         if case_info:
-            await ctx.send(f"Case ID: {caseid} has been voided!")
+            await ctx.send(f"<:whitecheck:1285350764595773451> Case ID: {caseid} has been voided!")
         elif not case_info:
-            await ctx.send(f"Case ID: {caseid} could not be found!")
+            await ctx.send(f"<:xmark:1285350796841582612> Case ID: {caseid} could not be found!")
 
 
 async def setup(merx):

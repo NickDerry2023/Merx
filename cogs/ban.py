@@ -84,7 +84,7 @@ class BanCommandCog(commands.Cog):
 
         # Send the success message
         
-        await ctx.send(f"<:whitecheck:1285350764595773451> **{case_id} - {member}** has been banned for {reason}.")
+        await ctx.send(f"<:whitecheck:1285350764595773451> **Case #{case_id} - {member}** has been banned for {reason}.")
             
             
             
@@ -121,7 +121,7 @@ class BanCommandCog(commands.Cog):
 
             await ctx.guild.unban(user_to_unban, reason=reason)
             case_number = f"Case #{str(uuid.uuid4().int)[:4]}"  # Generate a short unique case number
-            await ctx.send(f"<:whitecheck:1285350764595773451> **Case #{case_number} - Successfully unbanned {user_to_unban.mention}** for: {reason}.", ephemeral=True)
+            await ctx.send(f"<:whitecheck:1285350764595773451> **{case_number} - Successfully unbanned {user_to_unban.mention}** for: {reason}.", ephemeral=True)
 
 
         except discord.Forbidden:
