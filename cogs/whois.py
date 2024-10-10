@@ -13,6 +13,9 @@ class WhoisCommandCog(commands.Cog):
 
     @commands.hybrid_command(description="Show all information about a certain user.", with_app_command=True, extras={"category": "General"})
     async def whois(self, ctx, member: discord.User = None):
+        if member == None:
+            member = ctx.author
+
         try:
             fetched_member: discord.Member = await self.merx.fetch_user(member.id)
         except Exception as e:
