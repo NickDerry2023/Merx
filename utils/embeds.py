@@ -75,7 +75,7 @@ class UserErrorEmbed(discord.Embed):
     def __init__(self, error_id):
         super().__init__(
             title="Something Went Wrong",
-            description=f"Please contact [Merx Support](https://discord.gg/merxbot) or email `support@merxbot.xyz`!\nError ID: `{error_id}`",
+            description=f"Please contact [Merx Support](https://discord.gg/merxbot) for support!\nError ID: `{error_id}`",
             color=discord.Color.red()
         )
 
