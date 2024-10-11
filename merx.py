@@ -22,6 +22,7 @@ class Merx(commands.AutoShardedBot):
         self.beta_guilds = [
             1285107028892717118, # Merx Systems Discord
             1058691867484639232, # Feme's bot testing
+            1283960722279239750, # 2nd testing guild for feme12
         ]
         
         

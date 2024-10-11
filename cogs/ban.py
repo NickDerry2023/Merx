@@ -7,14 +7,14 @@ from utils.utils import get_next_case_id
 import time
 
 class BanCommandCog(commands.Cog):
-    def __init__(self, merx):
+    def __init__(self, merx: commands.Bot):
         self.merx = merx
     
     @commands.hybrid_command(name="ban", description="Ban command to ban members from your server.", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_guild_permissions(ban_members=True)
     async def ban(self, ctx: commands.Context, member: discord.User, *, reason: str = "Nothing was provided"):
         try:
-            fetched_member: discord.Member = await self.merx.fetch_user(member.id)
+            fetched_member: discord.Member = await ctx.guild.fetch_member(member.id)
         except Exception as e:
             raise commands.CommandInvokeError(e)
         
@@ -32,20 +32,24 @@ class BanCommandCog(commands.Cog):
         # Moved the error checking to the top to prevent as many nested if statements.
 
         if user_to_unban:
-            return await ctx.send(f"<:xmark:1285350796841582612> User {fetched_member} is already banned.", ephemeral=True)
+            await ctx.send(f"<:xmark:1285350796841582612> User {fetched_member} is already banned.", ephemeral=True)
+            return 
         
         
         elif fetched_member == ctx.author:
-            return await ctx.send("<:xmark:1285350796841582612> You cannot ban yourself!")
+            await ctx.send("<:xmark:1285350796841582612> You cannot ban yourself!")
+            return 
     
     
         elif fetched_member == ctx.guild.me:
-            return await ctx.send("<:xmark:1285350796841582612> I cannot ban myself!")
+            await ctx.send("<:xmark:1285350796841582612> I cannot ban myself!")
+            return 
         
         
         try:
             if fetched_member.top_role >= ctx.author.top_role:
-                return await ctx.send("You cannot ban a member with an equal or higher role!")
+                await ctx.send("You cannot ban a member with an equal or higher role!")
+                return 
             
             
         except AttributeError:
@@ -55,18 +59,22 @@ class BanCommandCog(commands.Cog):
         
         case_id = await get_next_case_id(ctx.guild.id)
 
-        try:
-            dm_message = f"<:whitecheck:1285350764595773451> **{case_id} - You have been banned from {ctx.guild.name}** for {reason}."
-            await fetched_member.send(dm_message)
-        except discord.Forbidden:
-            await ctx.send(f"<:xmark:1285350796841582612> Unable to send a DM to {fetched_member.mention}; proceeding with the ban.")
-
 
         # Perform the ban operation
         try:
-            await ctx.guild.ban(fetched_member, reason=reason)
+            try:
+                await ctx.guild.ban(fetched_member, reason=reason)
+                try:
+                    dm_message = f"<:whitecheck:1285350764595773451> **{case_id} - You have been banned from {ctx.guild.name}** for {reason}."
+                    await fetched_member.send(dm_message)
+                except discord.Forbidden:
+                    await ctx.send(f"<:xmark:1285350796841582612> Unable to send a DM to {fetched_member.mention}; proceeding with the ban.")
+            except discord.Forbidden:
+                await ctx.reply("<:xmark:1285350796841582612> I don't have permission to ban that user.")
+                return False
         except Exception as e:
             raise commands.CommandInvokeError(e)
+        
         
         # Log to MongoDB
         
